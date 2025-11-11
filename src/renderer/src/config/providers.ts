@@ -68,19 +68,7 @@ import type {
 import { isSystemProvider, OpenAIServiceTiers } from '@renderer/types'
 
 import { TOKENFLUX_HOST } from './constant'
-import { glm45FlashModel, qwen38bModel, SYSTEM_MODELS } from './models'
-
-export const CHERRYAI_PROVIDER: SystemProvider = {
-  id: 'cherryai' as SystemProviderId,
-  name: 'CherryAI',
-  type: 'openai',
-  apiKey: '',
-  apiHost: 'https://api.cherry-ai.com/',
-  anthropicApiHost: 'https://api.cherry-ai.com',
-  models: [glm45FlashModel, qwen38bModel],
-  isSystem: true,
-  enabled: true
-}
+import { SYSTEM_MODELS } from './models'
 
 export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> = {
   cherryin: {
@@ -678,7 +666,8 @@ export const SYSTEM_PROVIDERS_CONFIG: Record<SystemProviderId, SystemProvider> =
   }
 } as const
 
-export const SYSTEM_PROVIDERS: SystemProvider[] = Object.values(SYSTEM_PROVIDERS_CONFIG)
+const CORE_PROVIDER_IDS: SystemProviderId[] = ['anthropic', 'azure-openai', 'gemini', 'vertexai', 'aws-bedrock']
+export const SYSTEM_PROVIDERS: SystemProvider[] = CORE_PROVIDER_IDS.map((id) => SYSTEM_PROVIDERS_CONFIG[id])
 
 export const PROVIDER_LOGO_MAP: AtLeast<SystemProviderId, string> = {
   cherryin: CherryInProviderLogo,

@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 1650e5bca4a80b4bd7dc7b93e9cd451f6670eabc..50d6ef7523d1932ac8301842ae84601a3625be85 100644
+--- a/package.json
++++ b/package.json
+@@ -61,7 +61,6 @@
+     "test:typecheck": "tsc --noEmit",
+     "test:unit": "vitest run",
+     "prevendor": "del src/vendor",
+-    "vendor": "mkdir -p src/vendor/zod-to-json-schema && cp -r node_modules/openai/src/_vendor/zod-to-json-schema src/vendor",
+-    "preinstall": "npx only-allow pnpm"
++    "vendor": "mkdir -p src/vendor/zod-to-json-schema && cp -r node_modules/openai/src/_vendor/zod-to-json-schema src/vendor"
+   }
+ }

@@ -1,29 +1,32 @@
 import type { Model, SystemProviderId } from '@renderer/types'
 
-export const glm45FlashModel: Model = {
-  id: 'glm-4.5-flash',
-  name: 'GLM-4.5-Flash',
-  provider: 'cherryai',
-  group: 'GLM-4.5'
+const defaultAssistantModel: Model = {
+  id: 'claude-3-5-sonnet-20241022',
+  name: 'Claude 3.5 Sonnet',
+  provider: 'anthropic',
+  group: 'Claude 3.5'
 }
 
-export const qwen38bModel: Model = {
-  id: 'Qwen/Qwen3-8B',
-  name: 'Qwen3-8B',
-  provider: 'cherryai',
-  group: 'Qwen'
+const defaultTranslateModel: Model = {
+  id: 'gemini-2.5-flash',
+  name: 'Gemini 2.5 Flash',
+  provider: 'gemini',
+  group: 'Gemini 2.5'
 }
+
+export const glm45FlashModel = defaultAssistantModel
+export const qwen38bModel = defaultTranslateModel
 
 export const SYSTEM_MODELS: Record<SystemProviderId | 'defaultModel', Model[]> = {
   defaultModel: [
     // Default assistant model
-    glm45FlashModel,
+    defaultAssistantModel,
     // Default topic naming model
-    qwen38bModel,
+    defaultAssistantModel,
     // Default translation model
-    glm45FlashModel,
+    defaultTranslateModel,
     // Default quick assistant model
-    glm45FlashModel
+    defaultAssistantModel
   ],
   cherryin: [],
   vertexai: [],
