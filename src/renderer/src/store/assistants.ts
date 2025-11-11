@@ -14,7 +14,7 @@ export interface AssistantsState {
   tagsOrder: string[]
   collapsedTags: Record<string, boolean>
   presets: AssistantPreset[]
-  unifiedListOrder: Array<{ type: 'agent' | 'assistant'; id: string }>
+  unifiedListOrder: Array<{ type: 'assistant'; id: string }>
 }
 
 const initialState: AssistantsState = {
@@ -99,7 +99,7 @@ const assistantsSlice = createSlice({
         [tag]: !prev[tag]
       }
     },
-    setUnifiedListOrder: (state, action: PayloadAction<Array<{ type: 'agent' | 'assistant'; id: string }>>) => {
+    setUnifiedListOrder: (state, action: PayloadAction<Array<{ type: 'assistant'; id: string }>>) => {
       state.unifiedListOrder = action.payload
     },
     addTopic: (state, action: PayloadAction<{ assistantId: string; topic: Topic }>) => {

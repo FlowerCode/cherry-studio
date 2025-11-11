@@ -5,16 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 
 // --- Mocks Setup ---
 
-// Add this before the test suites
-vi.mock('@renderer/config/minapps', () => {
-  return {
-    ORIGIN_DEFAULT_MIN_APPS: [],
-    DEFAULT_MIN_APPS: [],
-    loadCustomMiniApp: async () => [],
-    updateDefaultMinApps: vi.fn()
-  }
-})
-
 // Mock window.api
 beforeEach(() => {
   Object.defineProperty(window, 'api', {

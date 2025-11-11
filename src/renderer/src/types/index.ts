@@ -559,7 +559,6 @@ export type SidebarIcon =
   | 'store'
   | 'paintings'
   | 'translate'
-  | 'minapp'
   | 'knowledge'
   | 'files'
   | 'code_tools'

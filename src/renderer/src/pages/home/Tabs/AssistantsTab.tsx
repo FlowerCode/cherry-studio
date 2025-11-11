@@ -1,20 +1,16 @@
 import Scrollbar from '@renderer/components/Scrollbar'
-import { useAgents } from '@renderer/hooks/agents/useAgents'
-import { useApiServer } from '@renderer/hooks/useApiServer'
 import { useAssistants } from '@renderer/hooks/useAssistant'
-import { useAssistantPresets } from '@renderer/hooks/useAssistantPresets'
-import { useRuntime } from '@renderer/hooks/useRuntime'
 import { useAssistantsTabSortType } from '@renderer/hooks/useStore'
 import { useTags } from '@renderer/hooks/useTags'
-import type { Assistant, AssistantsSortType, Topic } from '@renderer/types'
+import type { Assistant, AssistantsSortType } from '@renderer/types'
+import { Button } from 'antd'
+import { Plus } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import UnifiedAddButton from './components/UnifiedAddButton'
 import { UnifiedList } from './components/UnifiedList'
 import { UnifiedTagGroups } from './components/UnifiedTagGroups'
-import { useActiveAgent } from './hooks/useActiveAgent'
 import { useUnifiedGrouping } from './hooks/useUnifiedGrouping'
 import { useUnifiedItems } from './hooks/useUnifiedItems'
 import { useUnifiedSorting } from './hooks/useUnifiedSorting'
@@ -29,31 +25,14 @@ interface AssistantsTabProps {
 const AssistantsTab: FC<AssistantsTabProps> = (props) => {
   const { activeAssistant, setActiveAssistant, onCreateAssistant, onCreateDefaultAssistant } = props
   const containerRef = useRef<HTMLDivElement>(null)
-  const { apiServerConfig } = useApiServer()
-  const apiServerEnabled = apiServerConfig.enabled
-  const { chat } = useRuntime()
 
-  // Agent related hooks
-  const { agents, deleteAgent, isLoading: agentsLoading, error: agentsError } = useAgents()
-  const { activeAgentId } = chat
-  const { setActiveAgentId } = useActiveAgent()
-
-  // Assistant related hooks
   const { assistants, removeAssistant, copyAssistant, updateAssistants } = useAssistants()
-  const { addAssistantPreset } = useAssistantPresets()
   const { collapsedTags, toggleTagCollapse } = useTags()
   const { assistantsTabSortType = 'list', setAssistantsTabSortType } = useAssistantsTabSortType()
   const [dragging, setDragging] = useState(false)
 
   // Unified items management
-  const { unifiedItems, handleUnifiedListReorder } = useUnifiedItems({
-    agents,
-    assistants,
-    apiServerEnabled,
-    agentsLoading,
-    agentsError,
-    updateAssistants
-  })
+  const { unifiedItems, handleUnifiedListReorder } = useUnifiedItems({ assistants, updateAssistants })
 
   // Sorting
   const { sortByPinyinAsc, sortByPinyinDesc } = useUnifiedSorting({
@@ -65,10 +44,6 @@ const AssistantsTab: FC<AssistantsTabProps> = (props) => {
   const { groupedUnifiedItems, handleUnifiedGroupReorder } = useUnifiedGrouping({
     unifiedItems,
     assistants,
-    agents,
-    apiServerEnabled,
-    agentsLoading,
-    agentsError,
     updateAssistants
   })
 
@@ -91,43 +66,19 @@ const AssistantsTab: FC<AssistantsTabProps> = (props) => {
     [setAssistantsTabSortType]
   )
 
-  const handleAgentPress = useCallback(
-    (agentId: string) => {
-      setActiveAgentId(agentId)
-      // TODO: should allow it to be null
-      setActiveAssistant({
-        id: 'fake',
-        name: '',
-        prompt: '',
-        topics: [
-          {
-            id: 'fake',
-            assistantId: 'fake',
-            name: 'fake',
-            createdAt: '',
-            updatedAt: '',
-            messages: []
-          } as unknown as Topic
-        ],
-        type: 'chat'
-      })
-    },
-    [setActiveAgentId, setActiveAssistant]
-  )
-
   return (
     <Container className="assistants-tab" ref={containerRef}>
-      <UnifiedAddButton
-        onCreateAssistant={onCreateAssistant}
-        setActiveAssistant={setActiveAssistant}
-        setActiveAgentId={setActiveAgentId}
-      />
+      <AddAssistantRow>
+        <Button icon={<Plus size={14} />} type="primary" onClick={onCreateAssistant}>
+          {`Add Assistant`}
+        </Button>
+        <Button onClick={onCreateDefaultAssistant}>Add Blank Assistant</Button>
+      </AddAssistantRow>
 
       {assistantsTabSortType === 'tags' ? (
         <UnifiedTagGroups
           groupedItems={groupedUnifiedItems}
           activeAssistantId={activeAssistant.id}
-          activeAgentId={activeAgentId}
           sortBy={assistantsTabSortType}
           collapsedTags={collapsedTags}
           onGroupReorder={handleUnifiedGroupReorder}
@@ -136,9 +87,7 @@ const AssistantsTab: FC<AssistantsTabProps> = (props) => {
           onToggleTagCollapse={toggleTagCollapse}
           onAssistantSwitch={setActiveAssistant}
           onAssistantDelete={onDeleteAssistant}
-          onAgentDelete={deleteAgent}
-          onAgentPress={handleAgentPress}
-          addPreset={addAssistantPreset}
+          addPreset={() => {}}
           copyAssistant={copyAssistant}
           onCreateDefaultAssistant={onCreateDefaultAssistant}
           handleSortByChange={handleSortByChange}
@@ -149,16 +98,13 @@ const AssistantsTab: FC<AssistantsTabProps> = (props) => {
         <UnifiedList
           items={unifiedItems}
           activeAssistantId={activeAssistant.id}
-          activeAgentId={activeAgentId}
           sortBy={assistantsTabSortType}
           onReorder={handleUnifiedListReorder}
           onDragStart={() => setDragging(true)}
           onDragEnd={() => setDragging(false)}
           onAssistantSwitch={setActiveAssistant}
           onAssistantDelete={onDeleteAssistant}
-          onAgentDelete={deleteAgent}
-          onAgentPress={handleAgentPress}
-          addPreset={addAssistantPreset}
+          addPreset={() => {}}
           copyAssistant={copyAssistant}
           onCreateDefaultAssistant={onCreateDefaultAssistant}
           handleSortByChange={handleSortByChange}
@@ -176,6 +122,13 @@ const Container = styled(Scrollbar)`
   display: flex;
   flex-direction: column;
   padding: 12px 10px;
+`
+
+const AddAssistantRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 `
 
 export default AssistantsTab

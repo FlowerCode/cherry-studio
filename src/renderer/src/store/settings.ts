@@ -168,10 +168,6 @@ export interface SettingsState {
   siyuanRootPath: string | null
   // 订阅的助手地址
   agentssubscribeUrl: string | null
-  // MinApps
-  maxKeepAliveMinapps: number
-  showOpenedMinappsInSidebar: boolean
-  minappsOpenLinkExternal: boolean
   // 隐私设置
   enableDataCollection: boolean
   enableSpellCheck: boolean
@@ -347,10 +343,6 @@ export const initialState: SettingsState = {
   siyuanBoxId: null,
   siyuanRootPath: null,
   agentssubscribeUrl: '',
-  // MinApps
-  maxKeepAliveMinapps: 3,
-  showOpenedMinappsInSidebar: true,
-  minappsOpenLinkExternal: false,
   enableDataCollection: false,
   enableSpellCheck: false,
   spellCheckLanguages: [],
@@ -659,12 +651,10 @@ const settingsSlice = createSlice({
       state.topicNamingPrompt = action.payload
     },
     setSidebarIcons: (state, action: PayloadAction<{ visible?: SidebarIcon[]; disabled?: SidebarIcon[] }>) => {
-      if (action.payload.visible) {
-        state.sidebarIcons.visible = action.payload.visible
-      }
-      if (action.payload.disabled) {
-        state.sidebarIcons.disabled = action.payload.disabled
-      }
+      const visible = action.payload.visible?.filter((icon) => icon === 'assistants')
+      const sanitizedVisible = (visible && visible.length > 0 ? visible : ['assistants']) as SidebarIcon[]
+      state.sidebarIcons.visible = sanitizedVisible
+      state.sidebarIcons.disabled = []
     },
     setNarrowMode: (state, action: PayloadAction<boolean>) => {
       state.narrowMode = action.payload
@@ -758,15 +748,6 @@ const settingsSlice = createSlice({
     },
     setAgentssubscribeUrl: (state, action: PayloadAction<string>) => {
       state.agentssubscribeUrl = action.payload
-    },
-    setMaxKeepAliveMinapps: (state, action: PayloadAction<number>) => {
-      state.maxKeepAliveMinapps = action.payload
-    },
-    setShowOpenedMinappsInSidebar: (state, action: PayloadAction<boolean>) => {
-      state.showOpenedMinappsInSidebar = action.payload
-    },
-    setMinappsOpenLinkExternal: (state, action: PayloadAction<boolean>) => {
-      state.minappsOpenLinkExternal = action.payload
     },
     setEnableDataCollection: (state, action: PayloadAction<boolean>) => {
       state.enableDataCollection = action.payload
@@ -955,9 +936,6 @@ export const {
   setSiyuanBoxId,
   setAgentssubscribeUrl,
   setSiyuanRootPath,
-  setMaxKeepAliveMinapps,
-  setShowOpenedMinappsInSidebar,
-  setMinappsOpenLinkExternal,
   setEnableDataCollection,
   setEnableSpellCheck,
   setSpellCheckLanguages,

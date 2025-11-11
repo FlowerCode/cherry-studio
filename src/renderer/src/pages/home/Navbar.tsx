@@ -12,12 +12,11 @@ import { setNarrowMode } from '@renderer/store/settings'
 import type { Assistant, Topic } from '@renderer/types'
 import { Tooltip } from 'antd'
 import { t } from 'i18next'
-import { Menu, PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
+import { PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { FC } from 'react'
 import styled from 'styled-components'
 
-import AssistantsDrawer from './components/AssistantsDrawer'
 import UpdateAppButton from './components/UpdateAppButton'
 
 interface Props {
@@ -26,16 +25,9 @@ interface Props {
   setActiveTopic: (topic: Topic) => void
   setActiveAssistant: (assistant: Assistant) => void
   position: 'left' | 'right'
-  activeTopicOrSession?: 'topic' | 'session'
 }
 
-const HeaderNavbar: FC<Props> = ({
-  activeAssistant,
-  setActiveAssistant,
-  activeTopic,
-  setActiveTopic,
-  activeTopicOrSession
-}) => {
+const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTopic, setActiveTopic }) => {
   const { showAssistants, toggleShowAssistants } = useShowAssistants()
   const { topicPosition, narrowMode } = useSettings()
   const { showTopics, toggleShowTopics } = useShowTopics()
@@ -58,15 +50,6 @@ const HeaderNavbar: FC<Props> = ({
   const handleNarrowModeToggle = async () => {
     await modelGenerating()
     dispatch(setNarrowMode(!narrowMode))
-  }
-
-  const onShowAssistantsDrawer = () => {
-    AssistantsDrawer.show({
-      activeAssistant,
-      setActiveAssistant,
-      activeTopic,
-      setActiveTopic
-    })
   }
 
   return (
@@ -103,28 +86,15 @@ const HeaderNavbar: FC<Props> = ({
               <PanelRightClose size={18} />
             </NavbarIcon>
           </Tooltip>
-          <AnimatePresence initial={false}>
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 'auto', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              style={{ overflow: 'hidden' }}>
-              <NavbarIcon onClick={onShowAssistantsDrawer} style={{ marginLeft: 8 }}>
-                <Menu size={18} />
-              </NavbarIcon>
-            </motion.div>
-          </AnimatePresence>
-        </NavbarLeft>
-      )}
+      </NavbarLeft>
+    )}
       <NavbarCenter></NavbarCenter>
       <NavbarRight
         style={{
           justifyContent: 'flex-end',
-          flex: activeTopicOrSession === 'topic' ? 1 : 'none',
+          flex: 1,
           position: 'relative',
-          paddingRight: isWin || isLinux ? '144px' : '15px',
-          minWidth: activeTopicOrSession === 'topic' ? '' : 'auto'
+          paddingRight: isWin || isLinux ? '144px' : '15px'
         }}
         className="home-navbar-right">
         <HStack alignItems="center" gap={6}>

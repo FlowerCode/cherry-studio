@@ -1,21 +1,16 @@
-import { GlobalOutlined } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import Scrollbar from '@renderer/components/Scrollbar'
 import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
 import { Divider as AntDivider } from 'antd'
 import {
-  Brain,
   Cloud,
   Command,
-  FileCode,
   Hammer,
   HardDrive,
   Info,
   MonitorCog,
-  NotebookPen,
   Package,
   PictureInPicture2,
-  Server,
   Settings2,
   TextCursorInput,
   Zap
@@ -28,18 +23,13 @@ import styled from 'styled-components'
 import AboutSettings from './AboutSettings'
 import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
-import DocProcessSettings from './DocProcessSettings'
 import GeneralSettings from './GeneralSettings'
 import MCPSettings from './MCPSettings'
-import MemorySettings from './MemorySettings'
-import NotesSettings from './NotesSettings'
 import { ProviderList } from './ProviderSettings'
 import QuickAssistantSettings from './QuickAssistantSettings'
 import QuickPhraseSettings from './QuickPhraseSettings'
 import SelectionAssistantSettings from './SelectionAssistantSettings/SelectionAssistantSettings'
 import ShortcutSettings from './ShortcutSettings'
-import { ApiServerSettings } from './ToolSettings/ApiServerSettings'
-import WebSearchSettings from './WebSearchSettings'
 
 const SettingsPage: FC = () => {
   const { pathname } = useLocation()
@@ -92,36 +82,6 @@ const SettingsPage: FC = () => {
               {t('settings.mcp.title')}
             </MenuItem>
           </MenuItemLink>
-          <MenuItemLink to="/settings/notes">
-            <MenuItem className={isRoute('/settings/notes')}>
-              <NotebookPen size={18} />
-              {t('notes.settings.title')}
-            </MenuItem>
-          </MenuItemLink>
-          <MenuItemLink to="/settings/websearch">
-            <MenuItem className={isRoute('/settings/websearch')}>
-              <GlobalOutlined style={{ fontSize: 18 }} />
-              {t('settings.tool.websearch.title')}
-            </MenuItem>
-          </MenuItemLink>
-          <MenuItemLink to="/settings/memory">
-            <MenuItem className={isRoute('/settings/memory')}>
-              <Brain size={18} />
-              {t('memory.title')}
-            </MenuItem>
-          </MenuItemLink>
-          <MenuItemLink to="/settings/api-server">
-            <MenuItem className={isRoute('/settings/api-server')}>
-              <Server size={18} />
-              {t('apiServer.title')}
-            </MenuItem>
-          </MenuItemLink>
-          <MenuItemLink to="/settings/docprocess">
-            <MenuItem className={isRoute('/settings/docprocess')}>
-              <FileCode size={18} />
-              {t('settings.tool.preprocess.title')}
-            </MenuItem>
-          </MenuItemLink>
           <MenuItemLink to="/settings/quickphrase">
             <MenuItem className={isRoute('/settings/quickphrase')}>
               <Zap size={18} />
@@ -159,19 +119,14 @@ const SettingsPage: FC = () => {
           <Routes>
             <Route path="provider" element={<ProviderList />} />
             <Route path="model" element={<ModelSettings />} />
-            <Route path="websearch" element={<WebSearchSettings />} />
-            <Route path="api-server" element={<ApiServerSettings />} />
-            <Route path="docprocess" element={<DocProcessSettings />} />
             <Route path="quickphrase" element={<QuickPhraseSettings />} />
             <Route path="mcp/*" element={<MCPSettings />} />
-            <Route path="memory" element={<MemorySettings />} />
             <Route path="general/*" element={<GeneralSettings />} />
             <Route path="display" element={<DisplaySettings />} />
             <Route path="shortcut" element={<ShortcutSettings />} />
             <Route path="quickAssistant" element={<QuickAssistantSettings />} />
             <Route path="selectionAssistant" element={<SelectionAssistantSettings />} />
             <Route path="data" element={<DataSettings />} />
-            <Route path="notes" element={<NotesSettings />} />
             <Route path="about" element={<AboutSettings />} />
           </Routes>
         </SettingContent>

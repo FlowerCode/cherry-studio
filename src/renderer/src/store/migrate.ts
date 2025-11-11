@@ -1,7 +1,6 @@
 import { loggerService } from '@logger'
 import { nanoid } from '@reduxjs/toolkit'
 import { DEFAULT_CONTEXTCOUNT, DEFAULT_TEMPERATURE, isMac } from '@renderer/config/constant'
-import { DEFAULT_MIN_APPS } from '@renderer/config/minapps'
 import {
   glm45FlashModel,
   isFunctionCallingModel,
@@ -47,43 +46,6 @@ import { initialState as shortcutsInitialState } from './shortcuts'
 import { defaultWebSearchProviders } from './websearch'
 
 const logger = loggerService.withContext('Migrate')
-
-// remove logo base64 data to reduce the size of the state
-function removeMiniAppIconsFromState(state: RootState) {
-  if (state.minapps) {
-    state.minapps.enabled = state.minapps.enabled.map((app) => ({
-      ...app,
-      logo: undefined
-    }))
-    state.minapps.disabled = state.minapps.disabled.map((app) => ({
-      ...app,
-      logo: undefined
-    }))
-    state.minapps.pinned = state.minapps.pinned.map((app) => ({
-      ...app,
-      logo: undefined
-    }))
-  }
-}
-
-function removeMiniAppFromState(state: RootState, id: string) {
-  if (state.minapps) {
-    state.minapps.pinned = state.minapps.pinned.filter((app) => app.id !== id)
-    state.minapps.enabled = state.minapps.enabled.filter((app) => app.id !== id)
-    state.minapps.disabled = state.minapps.disabled.filter((app) => app.id !== id)
-  }
-}
-
-function addMiniApp(state: RootState, id: string) {
-  if (state.minapps) {
-    const app = DEFAULT_MIN_APPS.find((app) => app.id === id)
-    if (app) {
-      if (!state.minapps.enabled.find((app) => app.id === id)) {
-        state.minapps.enabled.push(app)
-      }
-    }
-  }
-}
 
 // add provider to state
 function addProvider(state: RootState, id: string) {
@@ -919,7 +881,6 @@ const migrateConfig = {
   },
   '59': (state: RootState) => {
     try {
-      addMiniApp(state, 'flowith')
       return state
     } catch (error) {
       return state
@@ -961,7 +922,6 @@ const migrateConfig = {
   },
   '63': (state: RootState) => {
     try {
-      addMiniApp(state, '3mintop')
       return state
     } catch (error) {
       return state
@@ -989,7 +949,6 @@ const migrateConfig = {
     try {
       addProvider(state, 'gitee-ai')
       addProvider(state, 'ppio')
-      addMiniApp(state, 'aistudio')
       state.llm.providers = state.llm.providers.filter((provider) => provider.id !== 'graphrag-kylin-mountain')
 
       return state
@@ -999,7 +958,6 @@ const migrateConfig = {
   },
   '67': (state: RootState) => {
     try {
-      addMiniApp(state, 'xiaoyi')
       addProvider(state, 'modelscope')
       addProvider(state, 'lmstudio')
       addProvider(state, 'perplexity')
@@ -1017,7 +975,6 @@ const migrateConfig = {
   },
   '68': (state: RootState) => {
     try {
-      addMiniApp(state, 'notebooklm')
       addProvider(state, 'modelscope')
       addProvider(state, 'lmstudio')
       return state
@@ -1027,7 +984,6 @@ const migrateConfig = {
   },
   '69': (state: RootState) => {
     try {
-      addMiniApp(state, 'coze')
       state.settings.gridColumns = 2
       state.settings.gridPopoverTrigger = 'hover'
       return state
@@ -1049,20 +1005,6 @@ const migrateConfig = {
   },
   '71': (state: RootState) => {
     try {
-      const appIds = ['dify', 'wpslingxi', 'lechat', 'abacus', 'lambdachat', 'baidu-ai-search']
-
-      if (state.minapps) {
-        appIds.forEach((id) => {
-          const app = DEFAULT_MIN_APPS.find((app) => app.id === id)
-          if (app) {
-            state.minapps.enabled.push(app)
-          }
-        })
-        // remove zhihu-zhiada
-        state.minapps.enabled = state.minapps.enabled.filter((app) => app.id !== 'zhihu-zhiada')
-        state.minapps.disabled = state.minapps.disabled.filter((app) => app.id !== 'zhihu-zhiada')
-      }
-
       state.settings.thoughtAutoCollapse = true
 
       return state
@@ -1072,8 +1014,6 @@ const migrateConfig = {
   },
   '72': (state: RootState) => {
     try {
-      addMiniApp(state, 'monica')
-
       // remove duplicate lmstudio providers
       const emptyLmStudioProviderIndex = state.llm.providers.findLastIndex(
         (provider) => provider.id === 'lmstudio' && provider.models.length === 0
@@ -1141,9 +1081,6 @@ const migrateConfig = {
   },
   '75': (state: RootState) => {
     try {
-      addMiniApp(state, 'you')
-      addMiniApp(state, 'cici')
-      addMiniApp(state, 'zhihu')
       return state
     } catch (error) {
       return state
@@ -1176,7 +1113,6 @@ const migrateConfig = {
     try {
       state.llm.providers = moveProvider(state.llm.providers, 'ppio', 9)
       state.llm.providers = moveProvider(state.llm.providers, 'infini', 10)
-      removeMiniAppIconsFromState(state)
       return state
     } catch (error) {
       return state
@@ -1275,8 +1211,6 @@ const migrateConfig = {
   },
   '87': (state: RootState) => {
     try {
-      state.settings.maxKeepAliveMinapps = 3
-      state.settings.showOpenedMinappsInSidebar = true
       return state
     } catch (error) {
       return state
@@ -1298,7 +1232,6 @@ const migrateConfig = {
   },
   '89': (state: RootState) => {
     try {
-      removeMiniAppFromState(state, 'aistudio')
       return state
     } catch (error) {
       return state
@@ -1330,7 +1263,6 @@ const migrateConfig = {
   },
   '92': (state: RootState) => {
     try {
-      addMiniApp(state, 'dangbei')
       state.llm.providers = moveProvider(state.llm.providers, 'qiniu', 12)
       return state
     } catch (error) {
@@ -1390,7 +1322,6 @@ const migrateConfig = {
   },
   '97': (state: RootState) => {
     try {
-      addMiniApp(state, 'zai')
       state.settings.webdavMaxBackups = 0
       if (state.websearch && state.websearch.providers) {
         state.websearch.providers.forEach((provider) => {
@@ -1589,7 +1520,6 @@ const migrateConfig = {
   '105': (state: RootState) => {
     try {
       state.settings.notification = settingsInitialState.notification
-      addMiniApp(state, 'google')
       if (!state.settings.openAI) {
         state.settings.openAI = {
           summaryText: 'off',
@@ -2365,7 +2295,6 @@ const migrateConfig = {
   },
   '143': (state: RootState) => {
     try {
-      addMiniApp(state, 'longcat')
       return state
     } catch (error) {
       return state
@@ -2612,9 +2541,6 @@ const migrateConfig = {
   },
   '161': (state: RootState) => {
     try {
-      removeMiniAppFromState(state, 'nm-search')
-      removeMiniAppFromState(state, 'hika')
-      removeMiniAppFromState(state, 'hugging-chat')
       addProvider(state, 'cherryin')
       state.llm.providers = moveProvider(state.llm.providers, 'cherryin', 1)
       return state
@@ -2694,10 +2620,6 @@ const migrateConfig = {
   },
   '172': (state: RootState) => {
     try {
-      // Add ling and huggingchat mini apps
-      addMiniApp(state, 'ling')
-      addMiniApp(state, 'huggingchat')
-
       // Add ovocr provider and clear ovms paintings
       addOcrProvider(state, BUILTIN_OCR_PROVIDERS_MAP.ovocr)
       if (isEmpty(state.paintings.ovms_paintings)) {

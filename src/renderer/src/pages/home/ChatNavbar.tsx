@@ -12,12 +12,11 @@ import { setNarrowMode } from '@renderer/store/settings'
 import type { Assistant, Topic } from '@renderer/types'
 import { Tooltip } from 'antd'
 import { t } from 'i18next'
-import { Menu, PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
+import { PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { FC } from 'react'
 import styled from 'styled-components'
 
-import AssistantsDrawer from './components/AssistantsDrawer'
 import ChatNavbarContent from './components/ChatNavbarContent'
 import UpdateAppButton from './components/UpdateAppButton'
 
@@ -56,15 +55,6 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
     dispatch(setNarrowMode(!narrowMode))
   }
 
-  const onShowAssistantsDrawer = () => {
-    AssistantsDrawer.show({
-      activeAssistant,
-      setActiveAssistant,
-      activeTopic,
-      setActiveTopic
-    })
-  }
-
   // const handleUpdateModel = useCallback(
   //   async (model: ApiModel) => {
   //     if (!activeSession || !activeAgent) return
@@ -90,19 +80,6 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTo
             </NavbarIcon>
           </Tooltip>
         )}
-        <AnimatePresence initial={false}>
-          {!showAssistants && isTopNavbar && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 'auto', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}>
-              <NavbarIcon onClick={onShowAssistantsDrawer} style={{ marginRight: 5 }}>
-                <Menu size={18} />
-              </NavbarIcon>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <ChatNavbarContent assistant={assistant} />
       </div>
       <HStack alignItems="center" gap={8}>

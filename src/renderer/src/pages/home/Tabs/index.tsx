@@ -1,24 +1,17 @@
 import AddAssistantPopup from '@renderer/components/Popups/AddAssistantPopup'
-import { useActiveSession } from '@renderer/hooks/agents/useActiveSession'
-import { useUpdateSession } from '@renderer/hooks/agents/useUpdateSession'
 import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
-import { useRuntime } from '@renderer/hooks/useRuntime'
 import { useNavbarPosition, useSettings } from '@renderer/hooks/useSettings'
 import { useShowTopics } from '@renderer/hooks/useStore'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
-import { useAppDispatch } from '@renderer/store'
-import { setActiveAgentId, setActiveTopicOrSessionAction } from '@renderer/store/runtime'
 import type { Assistant, Topic } from '@renderer/types'
 import type { Tab } from '@renderer/types/chat'
-import { classNames, getErrorMessage, uuid } from '@renderer/utils'
-import { Alert, Skeleton } from 'antd'
+import { classNames, uuid } from '@renderer/utils'
 import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import Assistants from './AssistantsTab'
-import SessionSettingsTab from './SessionSettingsTab'
 import Settings from './SettingsTab'
 import Topics from './TopicsTab'
 
@@ -49,14 +42,6 @@ const HomeTabs: FC<Props> = ({
   const { toggleShowTopics } = useShowTopics()
   const { isLeftNavbar } = useNavbarPosition()
   const { t } = useTranslation()
-  const { chat } = useRuntime()
-  const { activeTopicOrSession, activeAgentId } = chat
-  const { session, isLoading: isSessionLoading, error: sessionError } = useActiveSession()
-  const { updateSession } = useUpdateSession(activeAgentId)
-  const dispatch = useAppDispatch()
-
-  const isSessionView = activeTopicOrSession === 'session'
-  const isTopicView = activeTopicOrSession === 'topic'
 
   const [tab, setTab] = useState<Tab>(position === 'left' ? _tab || 'assistants' : 'topic')
   const borderStyle = '0.5px solid var(--color-border)'
@@ -75,8 +60,6 @@ const HomeTabs: FC<Props> = ({
     const assistant = await AddAssistantPopup.show()
     if (assistant) {
       setActiveAssistant(assistant)
-      dispatch(setActiveAgentId(null))
-      dispatch(setActiveTopicOrSessionAction('topic'))
     }
   }
 
@@ -84,8 +67,6 @@ const HomeTabs: FC<Props> = ({
     const assistant = { ...defaultAssistant, id: uuid() }
     addAssistant(assistant)
     setActiveAssistant(assistant)
-    dispatch(setActiveAgentId(null))
-    dispatch(setActiveTopicOrSessionAction('topic'))
   }
 
   useEffect(() => {
@@ -164,22 +145,7 @@ const HomeTabs: FC<Props> = ({
             position={position}
           />
         )}
-        {tab === 'settings' && isTopicView && <Settings assistant={activeAssistant} />}
-        {tab === 'settings' && isSessionView && !sessionError && (
-          <Skeleton loading={isSessionLoading} active style={{ height: '100%', padding: '16px' }}>
-            <SessionSettingsTab session={session} update={updateSession} />
-          </Skeleton>
-        )}
-        {tab === 'settings' && isSessionView && sessionError && (
-          <div className="w-[var(--assistants-width)] p-2 px-3 pt-4">
-            <Alert
-              type="error"
-              message={t('agent.session.get.error.failed')}
-              description={getErrorMessage(sessionError)}
-              style={{ padding: '10px 15px' }}
-            />
-          </div>
-        )}
+        {tab === 'settings' && <Settings assistant={activeAssistant} />}
       </TabContent>
     </Container>
   )
