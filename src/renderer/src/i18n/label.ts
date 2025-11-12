@@ -5,7 +5,7 @@
  */
 
 import { loggerService } from '@logger'
-import type { AgentType, BuiltinMCPServerName, BuiltinOcrProviderId, ThinkingOption } from '@renderer/types'
+import type { BuiltinMCPServerName, BuiltinOcrProviderId, ThinkingOption } from '@renderer/types'
 import { BuiltinMCPServerNames } from '@renderer/types'
 
 import i18n from './index'
@@ -331,7 +331,6 @@ export const getFileFieldLabel = (key: string): string => {
 
 const builtInMcpDescriptionKeyMap: Record<BuiltinMCPServerName, string> = {
   [BuiltinMCPServerNames.mcpAutoInstall]: 'settings.mcp.builtinServersDescriptions.mcp_auto_install',
-  [BuiltinMCPServerNames.memory]: 'settings.mcp.builtinServersDescriptions.memory',
   [BuiltinMCPServerNames.sequentialThinking]: 'settings.mcp.builtinServersDescriptions.sequentialthinking',
   [BuiltinMCPServerNames.braveSearch]: 'settings.mcp.builtinServersDescriptions.brave_search',
   [BuiltinMCPServerNames.fetch]: 'settings.mcp.builtinServersDescriptions.fetch',
@@ -357,13 +356,4 @@ export const getBuiltinOcrProviderLabel = (key: BuiltinOcrProviderId) => {
   else if (key == 'paddleocr') return 'PaddleOCR'
   else if (key == 'ovocr') return 'Intel OV(NPU) OCR'
   else return getLabel(builtinOcrProviderKeyMap, key)
-}
-
-export const getAgentTypeLabel = (key: AgentType) => {
-  switch (key) {
-    case 'claude-code':
-      return 'Claude Code'
-    default:
-      return 'Unknown Type'
-  }
 }

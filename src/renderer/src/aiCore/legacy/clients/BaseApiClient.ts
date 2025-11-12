@@ -16,7 +16,6 @@ import type {
   MCPCallToolResponse,
   MCPTool,
   MCPToolResponse,
-  MemoryItem,
   Model,
   OpenAIVerbosity,
   Provider,
@@ -278,7 +277,6 @@ export abstract class BaseApiClient<
 
     const webSearchReferences = await this.getWebSearchReferencesFromCache(message)
     const knowledgeReferences = await this.getKnowledgeBaseReferencesFromCache(message)
-    const memoryReferences = this.getMemoryReferencesFromCache(message)
 
     const knowledgeTextReferences = knowledgeReferences.filter((k) => k.metadata?.type !== 'image')
     const knowledgeImageReferences = knowledgeReferences.filter((k) => k.metadata?.type === 'image')
@@ -289,7 +287,7 @@ export abstract class BaseApiClient<
       id: ref.id + webSearchReferences.length // 为知识库引用的ID添加网络搜索引用的数量作为偏移量
     }))
 
-    const allReferences = [...webSearchReferences, ...reindexedKnowledgeReferences, ...memoryReferences]
+    const allReferences = [...webSearchReferences, ...reindexedKnowledgeReferences]
 
     logger.debug(`Found ${allReferences.length} references for ID: ${message.id}`, allReferences)
 
@@ -334,20 +332,6 @@ export abstract class BaseApiClient<
     }
 
     return ''
-  }
-
-  private getMemoryReferencesFromCache(message: Message) {
-    const memories = window.keyv.get(`memory-search-${message.id}`) as MemoryItem[] | undefined
-    if (memories) {
-      const memoryReferences: KnowledgeReference[] = memories.map((mem, index) => ({
-        id: index + 1,
-        content: `${mem.memory} -- Created at: ${mem.createdAt}`,
-        sourceUrl: '',
-        type: 'memory'
-      }))
-      return memoryReferences
-    }
-    return []
   }
 
   private async getWebSearchReferencesFromCache(message: Message) {

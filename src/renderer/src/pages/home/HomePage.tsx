@@ -81,16 +81,7 @@ const HomePage: FC = () => {
 
   return (
     <Container id="home-page">
-      {isLeftNavbar && (
-        <Navbar
-          activeAssistant={activeAssistant}
-          activeTopic={activeTopic}
-          setActiveTopic={setActiveTopic}
-          setActiveAssistant={setActiveAssistant}
-          position="left"
-          activeTopicOrSession="topic"
-        />
-      )}
+      {isLeftNavbar && <Navbar />}
       <ContentContainer id={isLeftNavbar ? 'content-container' : undefined}>
         <AnimatePresence initial={false}>
           {showAssistants && (

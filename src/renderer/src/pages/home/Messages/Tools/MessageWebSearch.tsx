@@ -1,4 +1,3 @@
-import type { WebSearchToolInput, WebSearchToolOutput } from '@renderer/aiCore/tools/WebSearchTool'
 import Spinner from '@renderer/components/Spinner'
 import type { NormalToolResponse } from '@renderer/types'
 import { Typography } from 'antd'
@@ -7,6 +6,16 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 const { Text } = Typography
+
+type WebSearchToolInput = {
+  additionalContext?: string
+  question?: string[]
+  links?: string[]
+}
+
+type WebSearchToolOutput = {
+  results?: Array<{ title?: string; url?: string; content?: string }>
+}
 
 export const MessageWebSearchToolTitle = ({ toolResponse }: { toolResponse: NormalToolResponse }) => {
   const { t } = useTranslation()

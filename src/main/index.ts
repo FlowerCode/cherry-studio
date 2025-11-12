@@ -15,8 +15,6 @@ import { isDev, isLinux, isWin } from './constant'
 import process from 'node:process'
 
 import { registerIpc } from './ipc'
-import { agentService } from './services/agents'
-import { apiServerService } from './services/ApiServerService'
 import { appMenuService } from './services/AppMenuService'
 import { configManager } from './services/ConfigManager'
 import mcpService from './services/MCPService'
@@ -162,39 +160,6 @@ if (!app.requestSingleInstanceLock()) {
     //start selection assistant service
     initSelectionService()
 
-    // Initialize Agent Service
-    try {
-      await agentService.initialize()
-      logger.info('Agent service initialized successfully')
-    } catch (error: any) {
-      logger.error('Failed to initialize Agent service:', error)
-    }
-
-    // Start API server if enabled or if agents exist
-    try {
-      const config = await apiServerService.getCurrentConfig()
-      logger.info('API server config:', config)
-
-      // Check if there are any agents
-      let shouldStart = config.enabled
-      if (!shouldStart) {
-        try {
-          const { total } = await agentService.listAgents({ limit: 1 })
-          if (total > 0) {
-            shouldStart = true
-            logger.info(`Detected ${total} agent(s), auto-starting API server`)
-          }
-        } catch (error: any) {
-          logger.warn('Failed to check agent count:', error)
-        }
-      }
-
-      if (shouldStart) {
-        await apiServerService.start()
-      }
-    } catch (error: any) {
-      logger.error('Failed to check/start API server:', error)
-    }
   })
 
   registerProtocolClient(app)
@@ -240,7 +205,6 @@ if (!app.requestSingleInstanceLock()) {
     // 简单的资源清理，不阻塞退出流程
     try {
       await mcpService.cleanup()
-      await apiServerService.stop()
     } catch (error) {
       logger.warn('Error cleaning up MCP service:', error as Error)
     }

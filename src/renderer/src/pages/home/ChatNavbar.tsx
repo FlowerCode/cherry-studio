@@ -9,11 +9,10 @@ import { useShowAssistants, useShowTopics } from '@renderer/hooks/useStore'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { useAppDispatch } from '@renderer/store'
 import { setNarrowMode } from '@renderer/store/settings'
-import type { Assistant, Topic } from '@renderer/types'
+import type { Assistant } from '@renderer/types'
 import { Tooltip } from 'antd'
 import { t } from 'i18next'
 import { PanelLeftClose, PanelRightClose, Search } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
 import type { FC } from 'react'
 import styled from 'styled-components'
 
@@ -22,13 +21,9 @@ import UpdateAppButton from './components/UpdateAppButton'
 
 interface Props {
   activeAssistant: Assistant
-  activeTopic: Topic
-  setActiveTopic: (topic: Topic) => void
-  setActiveAssistant: (assistant: Assistant) => void
-  position: 'left' | 'right'
 }
 
-const HeaderNavbar: FC<Props> = ({ activeAssistant, setActiveAssistant, activeTopic, setActiveTopic }) => {
+const HeaderNavbar: FC<Props> = ({ activeAssistant }) => {
   const { assistant } = useAssistant(activeAssistant.id)
   const { showAssistants, toggleShowAssistants } = useShowAssistants()
   const { topicPosition, narrowMode } = useSettings()

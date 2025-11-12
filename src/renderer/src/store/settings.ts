@@ -4,7 +4,6 @@ import { isMac } from '@renderer/config/constant'
 import { TRANSLATE_PROMPT } from '@renderer/config/prompts'
 import { DEFAULT_SIDEBAR_ICONS } from '@renderer/config/sidebar'
 import type {
-  ApiServerConfig,
   AssistantsSortType,
   CodeStyleVarious,
   LanguageVarious,
@@ -159,15 +158,11 @@ export interface SettingsState {
   joplinUrl: string | null
   joplinExportReasoning: boolean
   defaultObsidianVault: string | null
-  /** This state is actaully default assistant preset */
-  defaultAgent: string | null
   // 思源笔记配置
   siyuanApiUrl: string | null
   siyuanToken: string | null
   siyuanBoxId: string | null
   siyuanRootPath: string | null
-  // 订阅的助手地址
-  agentssubscribeUrl: string | null
   // 隐私设置
   enableDataCollection: boolean
   enableSpellCheck: boolean
@@ -214,7 +209,6 @@ export interface SettingsState {
   // UI
   navbarPosition: 'left' | 'top'
   // API Server
-  apiServer: ApiServerConfig
   showMessageOutline: boolean
 }
 
@@ -337,12 +331,10 @@ export const initialState: SettingsState = {
   joplinUrl: '',
   joplinExportReasoning: false,
   defaultObsidianVault: null,
-  defaultAgent: null,
   siyuanApiUrl: null,
   siyuanToken: null,
   siyuanBoxId: null,
   siyuanRootPath: null,
-  agentssubscribeUrl: '',
   enableDataCollection: false,
   enableSpellCheck: false,
   spellCheckLanguages: [],
@@ -400,13 +392,6 @@ export const initialState: SettingsState = {
   enableDeveloperMode: false,
   // UI
   navbarPosition: 'top',
-  // API Server
-  apiServer: {
-    enabled: false,
-    host: 'localhost',
-    port: 23333,
-    apiKey: `cs-sk-${uuid()}`
-  },
   showMessageOutline: false
 }
 
@@ -731,9 +716,6 @@ const settingsSlice = createSlice({
     setDefaultObsidianVault: (state, action: PayloadAction<string>) => {
       state.defaultObsidianVault = action.payload
     },
-    setDefaultAgent: (state, action: PayloadAction<string>) => {
-      state.defaultAgent = action.payload
-    },
     setSiyuanApiUrl: (state, action: PayloadAction<string>) => {
       state.siyuanApiUrl = action.payload
     },
@@ -745,9 +727,6 @@ const settingsSlice = createSlice({
     },
     setSiyuanRootPath: (state, action: PayloadAction<string>) => {
       state.siyuanRootPath = action.payload
-    },
-    setAgentssubscribeUrl: (state, action: PayloadAction<string>) => {
-      state.agentssubscribeUrl = action.payload
     },
     setEnableDataCollection: (state, action: PayloadAction<boolean>) => {
       state.enableDataCollection = action.payload
@@ -812,25 +791,6 @@ const settingsSlice = createSlice({
     },
     setNavbarPosition: (state, action: PayloadAction<'left' | 'top'>) => {
       state.navbarPosition = action.payload
-    },
-    // API Server actions
-    setApiServerEnabled: (state, action: PayloadAction<boolean>) => {
-      state.apiServer = {
-        ...state.apiServer,
-        enabled: action.payload
-      }
-    },
-    setApiServerPort: (state, action: PayloadAction<number>) => {
-      state.apiServer = {
-        ...state.apiServer,
-        port: action.payload
-      }
-    },
-    setApiServerApiKey: (state, action: PayloadAction<string>) => {
-      state.apiServer = {
-        ...state.apiServer,
-        apiKey: action.payload
-      }
     },
     setShowMessageOutline: (state, action: PayloadAction<boolean>) => {
       state.showMessageOutline = action.payload
@@ -930,11 +890,9 @@ export const {
   setJoplinExportReasoning,
   setMessageNavigation,
   setDefaultObsidianVault,
-  setDefaultAgent,
   setSiyuanApiUrl,
   setSiyuanToken,
   setSiyuanBoxId,
-  setAgentssubscribeUrl,
   setSiyuanRootPath,
   setEnableDataCollection,
   setEnableSpellCheck,
@@ -958,11 +916,7 @@ export const {
   setS3Partial,
   setEnableDeveloperMode,
   setNavbarPosition,
-  setShowMessageOutline,
-  // API Server actions
-  setApiServerEnabled,
-  setApiServerPort,
-  setApiServerApiKey
+  setShowMessageOutline
 } = settingsSlice.actions
 
 export default settingsSlice.reducer

@@ -1,4 +1,3 @@
-import { loggerService } from '@logger'
 import { Sortable, useDndReorder } from '@renderer/components/dnd'
 import HorizontalScrollContainer from '@renderer/components/HorizontalScrollContainer'
 import { isMac } from '@renderer/config/constant'
@@ -23,7 +22,6 @@ interface TabsContainerProps {
   children: React.ReactNode
 }
 
-const logger = loggerService.withContext('TabContainer')
 
 const getTabIcon = (tabId: string): React.ReactNode | undefined => {
   switch (tabId) {

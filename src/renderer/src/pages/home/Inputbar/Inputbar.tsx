@@ -7,10 +7,8 @@ import {
   isAutoEnableImageGenerationModel,
   isGenerateImageModel,
   isGenerateImageModels,
-  isMandatoryWebSearchModel,
   isVisionModel,
-  isVisionModels,
-  isWebSearchModel
+  isVisionModels
 } from '@renderer/config/models'
 import db from '@renderer/databases'
 import { useAssistant } from '@renderer/hooks/useAssistant'
@@ -29,7 +27,6 @@ import PasteService from '@renderer/services/PasteService'
 import { spanManagerService } from '@renderer/services/SpanManagerService'
 import { estimateTextTokens as estimateTxtTokens, estimateUserPromptUsage } from '@renderer/services/TokenService'
 import { translateText } from '@renderer/services/TranslateService'
-import WebSearchService from '@renderer/services/WebSearchService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { setSearching } from '@renderer/store/runtime'
 import { sendMessage as _sendMessage } from '@renderer/store/thunk/messageThunk'
@@ -821,15 +818,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   }
 
   useEffect(() => {
-    if (!isWebSearchModel(model) && assistant.enableWebSearch) {
-      updateAssistant({ ...assistant, enableWebSearch: false })
-    }
-    if (
-      assistant.webSearchProviderId &&
-      (!WebSearchService.isWebSearchEnabled(assistant.webSearchProviderId) || isMandatoryWebSearchModel(model))
-    ) {
-      updateAssistant({ ...assistant, webSearchProviderId: undefined })
-    }
     if (isGenerateImageModel(model)) {
       if (isAutoEnableImageGenerationModel(model) && !assistant.enableGenerateImage) {
         updateAssistant({ ...assistant, enableGenerateImage: true })

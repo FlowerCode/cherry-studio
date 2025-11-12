@@ -8,7 +8,6 @@ import {
   isAnthropicModel,
   isGeminiModel,
   isGenerateImageModel,
-  isMandatoryWebSearchModel,
   isSupportedReasoningEffortModel,
   isSupportedThinkingTokenModel,
   isVisionModel
@@ -33,7 +32,6 @@ import {
   Check,
   CircleChevronRight,
   FileSearch,
-  Globe,
   Hammer,
   Languages,
   Link,
@@ -66,8 +64,6 @@ import type { ThinkingButtonRef } from './ThinkingButton'
 import ThinkingButton from './ThinkingButton'
 import type { UrlContextButtonRef } from './UrlContextbutton'
 import UrlContextButton from './UrlContextbutton'
-import type { WebSearchButtonRef } from './WebSearchButton'
-import WebSearchButton from './WebSearchButton'
 
 const logger = loggerService.withContext('InputbarTools')
 
@@ -140,7 +136,6 @@ const InputbarTools = ({
   const knowledgeBaseButtonRef = useRef<KnowledgeBaseButtonRef>(null)
   const mcpToolsButtonRef = useRef<MCPToolsButtonRef>(null)
   const attachmentButtonRef = useRef<AttachmentButtonRef>(null)
-  const webSearchButtonRef = useRef<WebSearchButtonRef | null>(null)
   const thinkingButtonRef = useRef<ThinkingButtonRef | null>(null)
   const urlContextButtonRef = useRef<UrlContextButtonRef | null>(null)
 
@@ -288,15 +283,6 @@ const InputbarTools = ({
         }
       },
       {
-        label: t('chat.input.web_search.label'),
-        description: '',
-        icon: <Globe />,
-        isMenu: true,
-        action: () => {
-          webSearchButtonRef.current?.openQuickPanel()
-        }
-      },
-      {
         label: t('chat.input.url_context'),
         description: '',
         icon: <Link />,
@@ -396,12 +382,6 @@ const InputbarTools = ({
         label: t('chat.input.thinking.label'),
         component: <ThinkingButton ref={thinkingButtonRef} model={model} assistantId={assistant.id} />,
         condition: showThinkingButton
-      },
-      {
-        key: 'web_search',
-        label: t('chat.input.web_search.label'),
-        component: <WebSearchButton ref={webSearchButtonRef} assistantId={assistant.id} />,
-        condition: !isMandatoryWebSearchModel(model)
       },
       {
         key: 'url_context',

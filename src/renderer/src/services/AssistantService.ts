@@ -187,20 +187,20 @@ export function getAssistantById(id: string) {
   return assistants.find((a) => a.id === id)
 }
 
-export async function createAssistantFromAgent(agent: AssistantPreset) {
+export async function createAssistantFromPreset(preset: AssistantPreset) {
   const assistantId = uuid()
   const topic = getDefaultTopic(assistantId)
 
   const assistant: Assistant = {
-    ...agent,
+    ...preset,
     id: assistantId,
-    name: agent.name,
-    emoji: agent.emoji,
+    name: preset.name,
+    emoji: preset.emoji,
     topics: [topic],
-    model: agent.defaultModel,
+    model: preset.defaultModel,
     type: 'assistant',
-    regularPhrases: agent.regularPhrases || [], // Ensured regularPhrases
-    settings: agent.settings || DEFAULT_ASSISTANT_SETTINGS
+    regularPhrases: preset.regularPhrases || [],
+    settings: preset.settings || DEFAULT_ASSISTANT_SETTINGS
   }
 
   store.dispatch(addAssistant(assistant))

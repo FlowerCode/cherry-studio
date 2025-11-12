@@ -20,7 +20,6 @@ import {
   isWebSearchModel
 } from '@renderer/config/models'
 import { getAssistantSettings, getDefaultModel } from '@renderer/services/AssistantService'
-import store from '@renderer/store'
 import type { CherryWebSearchConfig } from '@renderer/store/websearch'
 import { type Assistant, type MCPTool, type Provider } from '@renderer/types'
 import type { StreamTextParams } from '@renderer/types/aiCoreTypes'
@@ -102,9 +101,9 @@ export async function buildStreamTextParams(
 
   // 构建真正的 providerOptions
   const webSearchConfig: CherryWebSearchConfig = {
-    maxResults: store.getState().websearch.maxResults,
-    excludeDomains: store.getState().websearch.excludeDomains,
-    searchWithTime: store.getState().websearch.searchWithTime
+    maxResults: 0,
+    excludeDomains: [],
+    searchWithTime: false
   }
 
   const providerOptions = buildProviderOptions(assistant, model, provider, {

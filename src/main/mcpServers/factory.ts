@@ -8,7 +8,6 @@ import DiDiMcpServer from './didi-mcp'
 import DifyKnowledgeServer from './dify-knowledge'
 import FetchServer from './fetch'
 import FileSystemServer from './filesystem'
-import MemoryServer from './memory'
 import PythonServer from './python'
 import ThinkingServer from './sequentialthinking'
 
@@ -21,10 +20,6 @@ export function createInMemoryMCPServer(
 ): Server {
   logger.debug(`[MCP] Creating in-memory MCP server: ${name} with args: ${args} and envs: ${JSON.stringify(envs)}`)
   switch (name) {
-    case BuiltinMCPServerNames.memory: {
-      const envPath = envs.MEMORY_FILE_PATH
-      return new MemoryServer(envPath).server
-    }
     case BuiltinMCPServerNames.sequentialThinking: {
       return new ThinkingServer().server
     }

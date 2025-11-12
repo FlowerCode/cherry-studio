@@ -12,25 +12,12 @@ import type { SpanEntity, TokenUsage } from '@mcp-trace/trace-core'
 import type { UpgradeChannel } from '@shared/config/constant'
 import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from '@shared/config/constant'
 import { IpcChannel } from '@shared/IpcChannel'
-import type { PluginError } from '@types'
-import type {
-  AgentPersistedMessage,
-  FileMetadata,
-  Notification,
-  OcrProvider,
-  Provider,
-  Shortcut,
-  SupportedOcrFile,
-  ThemeMode
-} from '@types'
+import type { FileMetadata, Notification, OcrProvider, Provider, Shortcut, SupportedOcrFile, ThemeMode } from '@types'
 import checkDiskSpace from 'check-disk-space'
 import type { ProxyConfig } from 'electron'
 import { BrowserWindow, dialog, ipcMain, session, shell, systemPreferences, webContents } from 'electron'
 import fontList from 'font-list'
 
-import { agentMessageRepository } from './services/agents/database'
-import { PluginService } from './services/agents/plugins/PluginService'
-import { apiServerService } from './services/ApiServerService'
 import appService from './services/AppService'
 import AppUpdater from './services/AppUpdater'
 import BackupManager from './services/BackupManager'
@@ -43,7 +30,6 @@ import { fileStorage as fileManager } from './services/FileStorage'
 import FileService from './services/FileSystemService'
 import KnowledgeService from './services/KnowledgeService'
 import mcpService from './services/MCPService'
-import MemoryService from './services/memory/MemoryService'
 import { openTraceWindow, setTraceWindowTitle } from './services/NodeTraceService'
 import NotificationService from './services/NotificationService'
 import * as NutstoreService from './services/NutstoreService'
@@ -96,22 +82,8 @@ const backupManager = new BackupManager()
 const exportService = new ExportService()
 const obsidianVaultService = new ObsidianVaultService()
 const vertexAIService = VertexAIService.getInstance()
-const memoryService = MemoryService.getInstance()
 const dxtService = new DxtService()
 const ovmsManager = new OvmsManager()
-const pluginService = PluginService.getInstance()
-
-function normalizeError(error: unknown): Error {
-  return error instanceof Error ? error : new Error(String(error))
-}
-
-function extractPluginError(error: unknown): PluginError | null {
-  if (error && typeof error === 'object' && 'type' in error && typeof (error as { type: unknown }).type === 'string') {
-    return error as PluginError
-  }
-  return null
-}
-
 export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   const appUpdater = new AppUpdater()
   const notificationService = new NotificationService()
@@ -238,27 +210,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
       configManager.setTestChannel(channel)
     }
   })
-
-  ipcMain.handle(IpcChannel.AgentMessage_PersistExchange, async (_event, payload) => {
-    try {
-      return await agentMessageRepository.persistExchange(payload)
-    } catch (error) {
-      logger.error('Failed to persist agent session messages', error as Error)
-      throw error
-    }
-  })
-
-  ipcMain.handle(
-    IpcChannel.AgentMessage_GetHistory,
-    async (_event, { sessionId }: { sessionId: string }): Promise<AgentPersistedMessage[]> => {
-      try {
-        return await agentMessageRepository.getSessionHistory(sessionId)
-      } catch (error) {
-        logger.error('Failed to get agent session history', error as Error)
-        throw error
-      }
-    }
-  )
 
   //only for mac
   if (isMac) {
@@ -610,38 +561,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle(IpcChannel.KnowledgeBase_Rerank, KnowledgeService.rerank.bind(KnowledgeService))
   ipcMain.handle(IpcChannel.KnowledgeBase_Check_Quota, KnowledgeService.checkQuota.bind(KnowledgeService))
 
-  // memory
-  ipcMain.handle(IpcChannel.Memory_Add, async (_, messages, config) => {
-    return await memoryService.add(messages, config)
-  })
-  ipcMain.handle(IpcChannel.Memory_Search, async (_, query, config) => {
-    return await memoryService.search(query, config)
-  })
-  ipcMain.handle(IpcChannel.Memory_List, async (_, config) => {
-    return await memoryService.list(config)
-  })
-  ipcMain.handle(IpcChannel.Memory_Delete, async (_, id) => {
-    return await memoryService.delete(id)
-  })
-  ipcMain.handle(IpcChannel.Memory_Update, async (_, id, memory, metadata) => {
-    return await memoryService.update(id, memory, metadata)
-  })
-  ipcMain.handle(IpcChannel.Memory_Get, async (_, memoryId) => {
-    return await memoryService.get(memoryId)
-  })
-  ipcMain.handle(IpcChannel.Memory_SetConfig, async (_, config) => {
-    memoryService.setConfig(config)
-  })
-  ipcMain.handle(IpcChannel.Memory_DeleteUser, async (_, userId) => {
-    return await memoryService.deleteUser(userId)
-  })
-  ipcMain.handle(IpcChannel.Memory_DeleteAllMemoriesForUser, async (_, userId) => {
-    return await memoryService.deleteAllMemoriesForUser(userId)
-  })
-  ipcMain.handle(IpcChannel.Memory_GetUsersList, async () => {
-    return await memoryService.getUsersList()
-  })
-
   // window
   ipcMain.handle(IpcChannel.Windows_SetMinimumSize, (_, width: number, height: number) => {
     checkMainWindow()
@@ -873,7 +792,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
     }
   })
   // API Server
-  apiServerService.registerIpcHandlers()
 
   // Anthropic OAuth
   ipcMain.handle(IpcChannel.Anthropic_StartOAuthFlow, () => anthropicService.startOAuthFlow())
@@ -917,119 +835,6 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
 
   // CherryAI
   ipcMain.handle(IpcChannel.Cherryai_GetSignature, (_, params) => generateSignature(params))
-
-  // Claude Code Plugins
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_ListAvailable, async () => {
-    try {
-      const data = await pluginService.listAvailable()
-      return { success: true, data }
-    } catch (error) {
-      const pluginError = extractPluginError(error)
-      if (pluginError) {
-        logger.error('Failed to list available plugins', pluginError)
-        return { success: false, error: pluginError }
-      }
-
-      const err = normalizeError(error)
-      logger.error('Failed to list available plugins', err)
-      return {
-        success: false,
-        error: {
-          type: 'TRANSACTION_FAILED',
-          operation: 'list-available',
-          reason: err.message
-        }
-      }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_Install, async (_, options) => {
-    try {
-      const data = await pluginService.install(options)
-      return { success: true, data }
-    } catch (error) {
-      logger.error('Failed to install plugin', { options, error })
-      return { success: false, error }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_Uninstall, async (_, options) => {
-    try {
-      await pluginService.uninstall(options)
-      return { success: true, data: undefined }
-    } catch (error) {
-      logger.error('Failed to uninstall plugin', { options, error })
-      return { success: false, error }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_ListInstalled, async (_, agentId: string) => {
-    try {
-      const data = await pluginService.listInstalled(agentId)
-      return { success: true, data }
-    } catch (error) {
-      const pluginError = extractPluginError(error)
-      if (pluginError) {
-        logger.error('Failed to list installed plugins', { agentId, error: pluginError })
-        return { success: false, error: pluginError }
-      }
-
-      const err = normalizeError(error)
-      logger.error('Failed to list installed plugins', { agentId, error: err })
-      return {
-        success: false,
-        error: {
-          type: 'TRANSACTION_FAILED',
-          operation: 'list-installed',
-          reason: err.message
-        }
-      }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_InvalidateCache, async () => {
-    try {
-      pluginService.invalidateCache()
-      return { success: true, data: undefined }
-    } catch (error) {
-      const pluginError = extractPluginError(error)
-      if (pluginError) {
-        logger.error('Failed to invalidate plugin cache', pluginError)
-        return { success: false, error: pluginError }
-      }
-
-      const err = normalizeError(error)
-      logger.error('Failed to invalidate plugin cache', err)
-      return {
-        success: false,
-        error: {
-          type: 'TRANSACTION_FAILED',
-          operation: 'invalidate-cache',
-          reason: err.message
-        }
-      }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_ReadContent, async (_, sourcePath: string) => {
-    try {
-      const data = await pluginService.readContent(sourcePath)
-      return { success: true, data }
-    } catch (error) {
-      logger.error('Failed to read plugin content', { sourcePath, error })
-      return { success: false, error }
-    }
-  })
-
-  ipcMain.handle(IpcChannel.ClaudeCodePlugin_WriteContent, async (_, options) => {
-    try {
-      await pluginService.writeContent(options.agentId, options.filename, options.type, options.content)
-      return { success: true, data: undefined }
-    } catch (error) {
-      logger.error('Failed to write plugin content', { options, error })
-      return { success: false, error }
-    }
-  })
 
   // WebSocket
   ipcMain.handle(IpcChannel.WebSocket_Start, WebSocketService.start)

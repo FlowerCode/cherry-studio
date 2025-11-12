@@ -11,7 +11,6 @@ import { ChunkType } from '@renderer/types/chunk'
 import { ProviderSpecificError } from '@renderer/types/provider-specific-error'
 import { formatErrorMessage } from '@renderer/utils/error'
 import { convertLinks, flushLinkConverterBuffer } from '@renderer/utils/linkConverter'
-import type { ClaudeCodeRawValue } from '@shared/agents/claudecode/types'
 import { AISDKError, type TextStreamPart, type ToolSet } from 'ai'
 
 import { ToolCallChunkHandler } from './handleToolCallChunk'
@@ -126,13 +125,16 @@ export class AiSdkToChunkAdapter {
     logger.silly(`AI SDK chunk type: ${chunk.type}`, chunk)
     switch (chunk.type) {
       case 'raw': {
-        const agentRawMessage = chunk.rawValue as ClaudeCodeRawValue
-        if (agentRawMessage.type === 'init' && agentRawMessage.session_id) {
-          this.onSessionUpdate?.(agentRawMessage.session_id)
+        const rawContent = chunk.rawValue
+        if (rawContent && typeof rawContent === 'object' && 'session_id' in rawContent) {
+          const sessionId = (rawContent as { session_id?: string }).session_id
+          if (sessionId) {
+            this.onSessionUpdate?.(sessionId)
+          }
         }
         this.onChunk({
           type: ChunkType.RAW,
-          content: agentRawMessage
+          content: rawContent
         })
         break
       }

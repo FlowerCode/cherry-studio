@@ -79,7 +79,7 @@ export const getRawTopicV2 = async (topicId: string): Promise<{ id: string; mess
 
 /**
  * Update file reference count
- * Only applies to Dexie data source, no-op for agent sessions
+ * Only applies to the local Dexie data source
  */
 export const updateFileCountV2 = async (
   fileId: string,

@@ -1,139 +1,47 @@
-import { loggerService } from '@renderer/services/LoggerService'
-import { useAppDispatch, useAppSelector } from '@renderer/store'
-import {
-  addDirectory,
-  clearDirectories,
-  removeDirectory,
-  resetCodeTools,
-  setCurrentDirectory,
-  setEnvironmentVariables,
-  setSelectedCliTool,
-  setSelectedModel,
-  setSelectedTerminal
-} from '@renderer/store/codeTools'
 import type { Model } from '@renderer/types'
-import { codeTools } from '@shared/config/constant'
-import { useCallback } from 'react'
 
-export const useCodeTools = () => {
-  const dispatch = useAppDispatch()
-  const codeToolsState = useAppSelector((state) => state.codeTools)
-  const logger = loggerService.withContext('useCodeTools')
+type VoidFn = () => void
 
-  // 设置选择的 CLI 工具
-  const setCliTool = useCallback(
-    (tool: codeTools) => {
-      dispatch(setSelectedCliTool(tool))
-    },
-    [dispatch]
-  )
+interface UseCodeToolsResult {
+  selectedCliTool: string | null
+  selectedModel: Model | null
+  selectedTerminal: string
+  environmentVariables: string
+  directories: string[]
+  currentDirectory: string | null
+  canLaunch: boolean
+  setCliTool: (tool: string) => void
+  setModel: (model: Model | null) => void
+  setTerminal: (terminal: string) => void
+  setEnvVars: (vars: string) => void
+  addDir: (directory: string) => void
+  removeDir: (directory: string) => void
+  setCurrentDir: (directory: string) => void
+  clearDirs: VoidFn
+  resetSettings: VoidFn
+  selectFolder: () => Promise<string | null>
+}
 
-  // 设置选择的模型
-  const setModel = useCallback(
-    (model: Model | null) => {
-      dispatch(setSelectedModel(model))
-    },
-    [dispatch]
-  )
-
-  // 设置选择的终端
-  const setTerminal = useCallback(
-    (terminal: string) => {
-      dispatch(setSelectedTerminal(terminal))
-    },
-    [dispatch]
-  )
-
-  // 设置环境变量
-  const setEnvVars = useCallback(
-    (envVars: string) => {
-      dispatch(setEnvironmentVariables(envVars))
-    },
-    [dispatch]
-  )
-
-  // 添加目录
-  const addDir = useCallback(
-    (directory: string) => {
-      dispatch(addDirectory(directory))
-    },
-    [dispatch]
-  )
-
-  // 删除目录
-  const removeDir = useCallback(
-    (directory: string) => {
-      dispatch(removeDirectory(directory))
-    },
-    [dispatch]
-  )
-
-  // 设置当前目录
-  const setCurrentDir = useCallback(
-    (directory: string) => {
-      dispatch(setCurrentDirectory(directory))
-    },
-    [dispatch]
-  )
-
-  // 清空所有目录
-  const clearDirs = useCallback(() => {
-    dispatch(clearDirectories())
-  }, [dispatch])
-
-  // 重置所有设置
-  const resetSettings = useCallback(() => {
-    dispatch(resetCodeTools())
-  }, [dispatch])
-
-  // 选择文件夹的辅助函数
-  const selectFolder = useCallback(async () => {
-    try {
-      const folderPath = await window.api.file.selectFolder()
-      if (folderPath) {
-        setCurrentDir(folderPath)
-        return folderPath
-      }
-      return null
-    } catch (error) {
-      logger.error('选择文件夹失败:', error as Error)
-      throw error
-    }
-  }, [setCurrentDir, logger])
-
-  // 获取当前CLI工具选择的模型
-  const selectedModel = codeToolsState.selectedModels[codeToolsState.selectedCliTool] || null
-
-  // 获取当前CLI工具的环境变量
-  const environmentVariables = codeToolsState?.environmentVariables?.[codeToolsState.selectedCliTool] || ''
-
-  // 检查是否可以启动（所有必需字段都已填写）
-  const canLaunch = Boolean(
-    codeToolsState.selectedCliTool &&
-      codeToolsState.currentDirectory &&
-      (codeToolsState.selectedCliTool === codeTools.githubCopilotCli || selectedModel)
-  )
+export const useCodeTools = (): UseCodeToolsResult => {
+  const noop = () => {}
 
   return {
-    // 状态
-    selectedCliTool: codeToolsState.selectedCliTool,
-    selectedModel: selectedModel,
-    selectedTerminal: codeToolsState.selectedTerminal,
-    environmentVariables: environmentVariables,
-    directories: codeToolsState.directories,
-    currentDirectory: codeToolsState.currentDirectory,
-    canLaunch,
-
-    // 操作函数
-    setCliTool,
-    setModel,
-    setTerminal,
-    setEnvVars,
-    addDir,
-    removeDir,
-    setCurrentDir,
-    clearDirs,
-    resetSettings,
-    selectFolder
+    selectedCliTool: null,
+    selectedModel: null,
+    selectedTerminal: '',
+    environmentVariables: '',
+    directories: [],
+    currentDirectory: null,
+    canLaunch: false,
+    setCliTool: noop,
+    setModel: noop,
+    setTerminal: noop,
+    setEnvVars: noop,
+    addDir: noop,
+    removeDir: noop,
+    setCurrentDir: noop,
+    clearDirs: noop,
+    resetSettings: noop,
+    selectFolder: async () => null
   }
 }

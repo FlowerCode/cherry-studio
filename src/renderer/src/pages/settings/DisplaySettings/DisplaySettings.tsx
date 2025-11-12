@@ -429,11 +429,6 @@ const TitleExtra = styled.div`
   text-decoration: underline;
   opacity: 0.7;
 `
-const ResetButtonWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
 const ZoomButtonGroup = styled.div`
   display: flex;
   align-items: center;

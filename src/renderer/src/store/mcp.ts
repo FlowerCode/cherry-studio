@@ -85,20 +85,6 @@ export const builtinMCPServers: BuiltinMCPServer[] = [
   },
   {
     id: nanoid(),
-    name: BuiltinMCPServerNames.memory,
-    reference: 'https://github.com/modelcontextprotocol/servers/tree/main/src/memory',
-    type: 'inMemory',
-    isActive: true,
-    env: {
-      MEMORY_FILE_PATH: 'YOUR_MEMORY_FILE_PATH'
-    },
-    shouldConfig: true,
-    provider: 'CherryAI',
-    installSource: 'builtin',
-    isTrusted: true
-  },
-  {
-    id: nanoid(),
     name: BuiltinMCPServerNames.sequentialThinking,
     type: 'inMemory',
     isActive: true,

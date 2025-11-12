@@ -17,8 +17,8 @@ export const useUnifiedSorting = (options: UseUnifiedSortingOptions) => {
 
   const sortUnifiedItemsByPinyin = useCallback((items: UnifiedItem[], isAscending: boolean) => {
     return [...items].sort((a, b) => {
-      const nameA = a.type === 'agent' ? a.data.name || a.data.id : a.data.name
-      const nameB = b.type === 'agent' ? b.data.name || b.data.id : b.data.name
+      const nameA = a.data.name || a.data.id
+      const nameB = b.data.name || b.data.id
       const pinyinA = tinyPinyin.convertToPinyin(nameA, '', true)
       const pinyinB = tinyPinyin.convertToPinyin(nameB, '', true)
       return isAscending ? pinyinA.localeCompare(pinyinB) : pinyinB.localeCompare(pinyinA)

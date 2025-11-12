@@ -5,7 +5,9 @@ import type { GenerateImagesConfig, GroundingMetadata, PersonGeneration } from '
 import type { CSSProperties } from 'react'
 
 export * from './file'
+export type { Message } from './newMessage'
 export * from './note'
+export * from './tool'
 
 import type { StreamTextParams } from './aiCoreTypes'
 import type { Chunk } from './chunk'
@@ -15,9 +17,7 @@ import type { MCPConfigSample, MCPServerInstallSource, McpServerType } from './m
 import type { Message } from './newMessage'
 import type { BaseTool, MCPTool } from './tool'
 
-export * from './agent'
 export * from './apiModels'
-export * from './apiServer'
 export * from './knowledge'
 export * from './mcp'
 export * from './notification'
@@ -49,7 +49,6 @@ export type Assistant = {
   knowledgeRecognition?: 'off' | 'on'
   regularPhrases?: QuickPhrase[] // Added for regular phrase
   tags?: string[] // 助手标签
-  enableMemory?: boolean
   // for translate. 更好的做法是定义base assistant，把 Assistant 作为多种不同定义 assistant 的联合类型，但重构代价太大
   content?: string
   targetLanguage?: TranslateLanguage
@@ -569,7 +568,6 @@ export type ExternalToolResult = {
   toolUse?: MCPToolResponse[]
   webSearch?: WebSearchResponse
   knowledge?: KnowledgeReference[]
-  memories?: MemoryItem[]
 }
 
 export const WebSearchProviderIds = {
@@ -718,7 +716,6 @@ export const isBuiltinMCPServer = (server: MCPServer): server is BuiltinMCPServe
 
 export const BuiltinMCPServerNames = {
   mcpAutoInstall: '@cherry/mcp-auto-install',
-  memory: '@cherry/memory',
   sequentialThinking: '@cherry/sequentialthinking',
   braveSearch: '@cherry/brave-search',
   fetch: '@cherry/fetch',
@@ -883,87 +880,6 @@ export type S3Config = {
   syncInterval: number
   maxBackups: number
 }
-
-export type { Message } from './newMessage'
-export * from './tool'
-
-// Memory Service Types
-// ========================================================================
-export interface MemoryConfig {
-  /**
-   * @deprecated use embedderApiClient instead
-   */
-  embedderModel?: Model
-  embedderDimensions?: number
-  /**
-   * @deprecated use llmApiClient instead
-   */
-  llmModel?: Model
-  embedderApiClient?: ApiClient
-  llmApiClient?: ApiClient
-  customFactExtractionPrompt?: string
-  customUpdateMemoryPrompt?: string
-  /** Indicates whether embedding dimensions are automatically detected */
-  isAutoDimensions?: boolean
-}
-
-export interface MemoryItem {
-  id: string
-  memory: string
-  hash?: string
-  createdAt?: string
-  updatedAt?: string
-  score?: number
-  metadata?: Record<string, any>
-}
-
-export interface MemorySearchResult {
-  results: MemoryItem[]
-  relations?: any[]
-}
-
-export interface MemoryEntity {
-  userId?: string
-  agentId?: string
-  runId?: string
-}
-
-export interface MemorySearchFilters {
-  userId?: string
-  agentId?: string
-  runId?: string
-  [key: string]: any
-}
-
-export interface AddMemoryOptions extends MemoryEntity {
-  metadata?: Record<string, any>
-  filters?: MemorySearchFilters
-  infer?: boolean
-}
-
-export interface MemorySearchOptions extends MemoryEntity {
-  limit?: number
-  filters?: MemorySearchFilters
-}
-
-export interface MemoryHistoryItem {
-  id: number
-  memoryId: string
-  previousValue?: string
-  newValue: string
-  action: 'ADD' | 'UPDATE' | 'DELETE'
-  createdAt: string
-  updatedAt: string
-  isDeleted: boolean
-}
-
-export interface MemoryListOptions extends MemoryEntity {
-  limit?: number
-  offset?: number
-}
-
-export interface MemoryDeleteAllOptions extends MemoryEntity {}
-
 export type EditorView = 'preview' | 'source' | 'read' // 实时,源码,预览
 // ========================================================================
 

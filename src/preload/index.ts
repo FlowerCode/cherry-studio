@@ -1,4 +1,3 @@
-import type { PermissionUpdate } from '@anthropic-ai/claude-agent-sdk'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { SpanEntity, TokenUsage } from '@mcp-trace/trace-core'
 import type { SpanContext } from '@opentelemetry/api'
@@ -8,27 +7,18 @@ import type { FileChangeEvent, WebviewKeyEvent } from '@shared/config/types'
 import { IpcChannel } from '@shared/IpcChannel'
 import type { Notification } from '@types'
 import type {
-  AddMemoryOptions,
-  AssistantMessage,
   FileListResponse,
   FileMetadata,
   FileUploadResponse,
-  GetApiServerStatusResult,
   KnowledgeBaseParams,
   KnowledgeItem,
   KnowledgeSearchResult,
   MCPServer,
-  MemoryConfig,
-  MemoryListOptions,
-  MemorySearchOptions,
   OcrProvider,
   OcrResult,
   Provider,
-  RestartApiServerStatusResult,
   S3Config,
   Shortcut,
-  StartApiServerStatusResult,
-  StopApiServerStatusResult,
   SupportedOcrFile,
   ThemeMode,
   WebDavConfig
@@ -37,15 +27,6 @@ import type { OpenDialogOptions } from 'electron'
 import { contextBridge, ipcRenderer, shell, webUtils } from 'electron'
 import type { CreateDirectoryOptions } from 'webdav'
 
-import type {
-  InstalledPlugin,
-  InstallPluginOptions,
-  ListAvailablePluginsResult,
-  PluginMetadata,
-  PluginResult,
-  UninstallPluginOptions,
-  WritePluginContentOptions
-} from '../renderer/src/types/plugin'
 import type { ActionItem } from '../renderer/src/types/selectionTypes'
 
 export function tracedInvoke(channel: string, spanContext: SpanContext | undefined, ...args: any[]) {
@@ -261,22 +242,6 @@ const api = {
     checkQuota: ({ base, userId }: { base: KnowledgeBaseParams; userId: string }) =>
       ipcRenderer.invoke(IpcChannel.KnowledgeBase_Check_Quota, base, userId)
   },
-  memory: {
-    add: (messages: string | AssistantMessage[], options?: AddMemoryOptions) =>
-      ipcRenderer.invoke(IpcChannel.Memory_Add, messages, options),
-    search: (query: string, options: MemorySearchOptions) =>
-      ipcRenderer.invoke(IpcChannel.Memory_Search, query, options),
-    list: (options?: MemoryListOptions) => ipcRenderer.invoke(IpcChannel.Memory_List, options),
-    delete: (id: string) => ipcRenderer.invoke(IpcChannel.Memory_Delete, id),
-    update: (id: string, memory: string, metadata?: Record<string, any>) =>
-      ipcRenderer.invoke(IpcChannel.Memory_Update, id, memory, metadata),
-    get: (id: string) => ipcRenderer.invoke(IpcChannel.Memory_Get, id),
-    setConfig: (config: MemoryConfig) => ipcRenderer.invoke(IpcChannel.Memory_SetConfig, config),
-    deleteUser: (userId: string) => ipcRenderer.invoke(IpcChannel.Memory_DeleteUser, userId),
-    deleteAllMemoriesForUser: (userId: string) =>
-      ipcRenderer.invoke(IpcChannel.Memory_DeleteAllMemoriesForUser, userId),
-    getUsersList: () => ipcRenderer.invoke(IpcChannel.Memory_GetUsersList)
-  },
   window: {
     setMinimumSize: (width: number, height: number) =>
       ipcRenderer.invoke(IpcChannel.Windows_SetMinimumSize, width, height),
@@ -440,15 +405,6 @@ const api = {
     minimizeActionWindow: () => ipcRenderer.invoke(IpcChannel.Selection_ActionWindowMinimize),
     pinActionWindow: (isPinned: boolean) => ipcRenderer.invoke(IpcChannel.Selection_ActionWindowPin, isPinned)
   },
-  agentTools: {
-    respondToPermission: (payload: {
-      requestId: string
-      behavior: 'allow' | 'deny'
-      updatedInput?: Record<string, unknown>
-      message?: string
-      updatedPermissions?: PermissionUpdate[]
-    }) => ipcRenderer.invoke(IpcChannel.AgentToolPermission_Response, payload)
-  },
   quoteToMainWindow: (text: string) => ipcRenderer.invoke(IpcChannel.App_QuoteToMain, text),
   setDisableHardwareAcceleration: (isDisable: boolean) =>
     ipcRenderer.invoke(IpcChannel.App_SetDisableHardwareAcceleration, isDisable),
@@ -521,36 +477,6 @@ const api = {
         ipcRenderer.removeListener(channel, listener)
       }
     }
-  },
-  apiServer: {
-    getStatus: (): Promise<GetApiServerStatusResult> => ipcRenderer.invoke(IpcChannel.ApiServer_GetStatus),
-    start: (): Promise<StartApiServerStatusResult> => ipcRenderer.invoke(IpcChannel.ApiServer_Start),
-    restart: (): Promise<RestartApiServerStatusResult> => ipcRenderer.invoke(IpcChannel.ApiServer_Restart),
-    stop: (): Promise<StopApiServerStatusResult> => ipcRenderer.invoke(IpcChannel.ApiServer_Stop),
-    onReady: (callback: () => void): (() => void) => {
-      const listener = () => {
-        callback()
-      }
-      ipcRenderer.on(IpcChannel.ApiServer_Ready, listener)
-      return () => {
-        ipcRenderer.removeListener(IpcChannel.ApiServer_Ready, listener)
-      }
-    }
-  },
-  claudeCodePlugin: {
-    listAvailable: (): Promise<PluginResult<ListAvailablePluginsResult>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_ListAvailable),
-    install: (options: InstallPluginOptions): Promise<PluginResult<PluginMetadata>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_Install, options),
-    uninstall: (options: UninstallPluginOptions): Promise<PluginResult<void>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_Uninstall, options),
-    listInstalled: (agentId: string): Promise<PluginResult<InstalledPlugin[]>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_ListInstalled, agentId),
-    invalidateCache: (): Promise<PluginResult<void>> => ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_InvalidateCache),
-    readContent: (sourcePath: string): Promise<PluginResult<string>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_ReadContent, sourcePath),
-    writeContent: (options: WritePluginContentOptions): Promise<PluginResult<void>> =>
-      ipcRenderer.invoke(IpcChannel.ClaudeCodePlugin_WriteContent, options)
   },
   webSocket: {
     start: () => ipcRenderer.invoke(IpcChannel.WebSocket_Start),

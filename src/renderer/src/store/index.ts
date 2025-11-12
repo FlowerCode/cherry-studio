@@ -19,7 +19,6 @@ import selectionStore from './selectionStore'
 import settings from './settings'
 import shortcuts from './shortcuts'
 import tabs from './tabs'
-import toolPermissions from './toolPermissions'
 
 const logger = loggerService.withContext('Store')
 
@@ -36,8 +35,7 @@ const rootReducer = combineReducers({
   tabs,
   messages: newMessagesReducer,
   messageBlocks: messageBlocksReducer,
-  inputTools: inputToolsReducer,
-  toolPermissions
+  inputTools: inputToolsReducer
 })
 
 const persistedReducer = persistReducer(
@@ -45,7 +43,7 @@ const persistedReducer = persistReducer(
     key: 'cherry-studio',
     storage,
     version: 172,
-    blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs', 'toolPermissions'],
+    blacklist: ['runtime', 'messages', 'messageBlocks', 'tabs'],
     migrate
   },
   rootReducer

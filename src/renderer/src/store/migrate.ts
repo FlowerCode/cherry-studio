@@ -565,13 +565,6 @@ const migrateConfig = {
     try {
       state.assistants.defaultAssistant.type = 'assistant'
 
-      // @ts-ignore
-      state.agents.agents.forEach((agent) => {
-        agent.type = 'agent'
-        // @ts-ignore eslint-disable-next-line
-        delete agent.group
-      })
-
       return {
         ...state,
         assistants: {
@@ -1045,15 +1038,6 @@ const migrateConfig = {
         if (leadingEmoji) {
           assistant.emoji = leadingEmoji
           assistant.name = assistant.name.replace(leadingEmoji, '').trim()
-        }
-      })
-
-      // @ts-ignore
-      state.agents.agents.forEach((agent) => {
-        const leadingEmoji = getLeadingEmoji(agent.name)
-        if (leadingEmoji) {
-          agent.emoji = leadingEmoji
-          agent.name = agent.name.replace(leadingEmoji, '').trim()
         }
       })
 
@@ -1771,12 +1755,7 @@ const migrateConfig = {
       state.llm.providers = moveProvider(state.llm.providers, 'new-api', 16)
       state.settings.disableHardwareAcceleration = false
       // migrate to enable memory feature on sidebar
-      if (state.settings && state.settings.sidebarIcons) {
-        // Check if 'memory' is not already in visible icons
-        if (!state.settings.sidebarIcons.visible.includes('memory' as any)) {
-          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'memory' as any]
-        }
-      }
+      // Memory feature removed; no sidebar updates required
       return state
     } catch (error) {
       logger.error('migrate 119 error', error as Error)
@@ -1786,17 +1765,6 @@ const migrateConfig = {
   '120': (state: RootState) => {
     try {
       // migrate to remove memory feature from sidebar (moved to settings)
-      if (state.settings && state.settings.sidebarIcons) {
-        // Remove 'memory' from visible icons if present
-        state.settings.sidebarIcons.visible = state.settings.sidebarIcons.visible.filter(
-          (icon) => icon !== ('memory' as any)
-        )
-        // Remove 'memory' from disabled icons if present
-        state.settings.sidebarIcons.disabled = state.settings.sidebarIcons.disabled.filter(
-          (icon) => icon !== ('memory' as any)
-        )
-      }
-
       if (!state.settings.s3) {
         state.settings.s3 = settingsInitialState.s3
       }
@@ -1949,15 +1917,6 @@ const migrateConfig = {
   },
   '125': (state: RootState) => {
     try {
-      // Initialize API server configuration if not present
-      if (!state.settings.apiServer) {
-        state.settings.apiServer = {
-          enabled: false,
-          host: 'localhost',
-          port: 23333,
-          apiKey: `cs-sk-${uuid()}`
-        }
-      }
       return state
     } catch (error) {
       logger.error('migrate 125 error', error as Error)
@@ -2502,17 +2461,6 @@ const migrateConfig = {
         }
       })
 
-      // @ts-ignore
-      state.agents.agents.forEach((agent) => {
-        // @ts-ignore model is not defined in Agent
-        if (agent.model?.provider === 'cherryin') {
-          // @ts-ignore model is not defined in Agent
-          agent.model.provider = 'cherryai'
-        }
-        if (agent.defaultModel?.provider === 'cherryin') {
-          agent.defaultModel.provider = 'cherryai'
-        }
-      })
       return state
     } catch (error) {
       logger.error('migrate 157 error', error as Error)
@@ -2624,15 +2572,6 @@ const migrateConfig = {
       addOcrProvider(state, BUILTIN_OCR_PROVIDERS_MAP.ovocr)
       if (isEmpty(state.paintings.ovms_paintings)) {
         state.paintings.ovms_paintings = []
-      }
-
-      // Migrate agents to assistants presets
-      // @ts-ignore
-      if (state?.agents?.agents) {
-        // @ts-ignore
-        state.assistants.presets = [...state.agents.agents]
-        // @ts-ignore
-        delete state.agents.agents
       }
 
       // Initialize assistants presets

@@ -8,7 +8,6 @@ import type {
   KnowledgeReference,
   MCPServer,
   MCPToolResponse,
-  MemoryItem,
   Metrics,
   Model,
   NormalToolResponse,
@@ -124,7 +123,6 @@ export interface CitationMessageBlock extends BaseMessageBlock {
   type: MessageBlockType.CITATION
   response?: WebSearchResponse
   knowledge?: KnowledgeReference[]
-  memories?: MemoryItem[]
 }
 
 // 文件块
@@ -205,9 +203,6 @@ export type Message = {
 
   // 跟踪Id
   traceId?: string
-
-  // Agent session identifier used to resume Claude Code runs
-  agentSessionId?: string
 
   // raw data
   // TODO: add this providerMetadata to MessageBlock to save raw provider data for each block

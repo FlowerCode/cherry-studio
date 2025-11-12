@@ -2,8 +2,7 @@ import { TopView } from '@renderer/components/TopView'
 import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
 import { useAssistantPresets } from '@renderer/hooks/useAssistantPresets'
 import { useTimer } from '@renderer/hooks/useTimer'
-import { useSystemAssistantPresets } from '@renderer/pages/store/assistants/presets'
-import { createAssistantFromAgent } from '@renderer/services/AssistantService'
+import { createAssistantFromPreset } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import type { Assistant, AssistantPreset } from '@renderer/types'
 import { uuid } from '@renderer/utils'
@@ -31,7 +30,7 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
   const { defaultAssistant } = useDefaultAssistant()
   const { assistants, addAssistant } = useAssistants()
   const inputRef = useRef<InputRef>(null)
-  const systemPresets = useSystemAssistantPresets()
+  const systemPresets: AssistantPreset[] = []
   const loadingRef = useRef(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -80,7 +79,7 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
         assistant = { ...preset, id: uuid() }
         addAssistant(assistant)
       } else {
-        assistant = await createAssistantFromAgent(preset)
+        assistant = await createAssistantFromPreset(preset)
       }
 
       setTimeoutTimer('onCreateAssistant', () => EventEmitter.emit(EVENT_NAMES.SHOW_ASSISTANTS), 0)
@@ -205,7 +204,6 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
               <span className="text-nowrap">{preset.name}</span>
             </HStack>
             {preset.id === 'default' && <Tag color="green">{t('assistants.presets.tag.system')}</Tag>}
-            {preset.type === 'agent' && <Tag color="orange">{t('assistants.presets.tag.agent')}</Tag>}
             {preset.id === 'new' && <Tag color="green">{t('assistants.presets.tag.new')}</Tag>}
           </AgentItem>
         ))}
