@@ -22,7 +22,6 @@ interface TabsContainerProps {
   children: React.ReactNode
 }
 
-
 const getTabIcon = (tabId: string): React.ReactNode | undefined => {
   switch (tabId) {
     case 'home':

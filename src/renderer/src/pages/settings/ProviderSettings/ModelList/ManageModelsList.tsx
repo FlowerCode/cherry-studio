@@ -4,7 +4,6 @@ import CustomTag from '@renderer/components/Tags/CustomTag'
 import { DynamicVirtualList } from '@renderer/components/VirtualList'
 import { getModelLogoById } from '@renderer/config/models'
 import { isNewApiProvider } from '@renderer/config/providers'
-import FileItem from '@renderer/pages/files/FileItem'
 import NewApiBatchAddModelPopup from '@renderer/pages/settings/ProviderSettings/ModelList/NewApiBatchAddModelPopup'
 import type { Model, Provider } from '@renderer/types'
 import { Button, Flex, Tooltip } from 'antd'
@@ -193,24 +192,20 @@ const ModelListItem: React.FC<ModelListItemProps> = memo(({ model, provider, onA
   const isAdded = useMemo(() => isModelInProvider(provider, model.id), [provider, model.id])
   return (
     <ModelListItemContainer last={last}>
-      <FileItem
-        style={{
-          backgroundColor: isAdded ? 'rgba(0, 126, 0, 0.06)' : '',
-          border: 'none',
-          boxShadow: 'none'
-        }}
-        fileInfo={{
-          icon: <Avatar src={getModelLogoById(model.id)}>{model?.name?.[0]?.toUpperCase()}</Avatar>,
-          name: <ModelIdWithTags model={model} />,
-          extra: model.description && <ExpandableText text={model.description} />,
-          ext: '.model',
-          actions: isAdded ? (
-            <Button type="text" onClick={() => onRemoveModel(model)} icon={<Minus size={16} />} />
-          ) : (
-            <Button type="text" onClick={() => onAddModel(model)} icon={<Plus size={16} />} />
-          )
-        }}
-      />
+      <ModelRowContent $highlight={isAdded}>
+        <Flex align="center" gap={12} style={{ flex: 1 }}>
+          <Avatar src={getModelLogoById(model.id)}>{model?.name?.[0]?.toUpperCase()}</Avatar>
+          <ModelInfo>
+            <ModelIdWithTags model={model} />
+            {model.description && <ExpandableText text={model.description} />}
+          </ModelInfo>
+        </Flex>
+        {isAdded ? (
+          <Button type="text" onClick={() => onRemoveModel(model)} icon={<Minus size={16} />} />
+        ) : (
+          <Button type="text" onClick={() => onAddModel(model)} icon={<Plus size={16} />} />
+        )}
+      </ModelRowContent>
     </ModelListItemContainer>
   )
 })
@@ -238,6 +233,22 @@ const ModelListItemContainer = styled.div<{ last?: boolean }>`
   border-radius: ${(props) => (props.last ? '0 0 8px 8px' : '0')};
   border-bottom: ${(props) => (props.last ? '1px solid var(--color-border)' : 'none')};
   margin-bottom: ${(props) => (props.last ? '8px' : '0')};
+`
+
+const ModelRowContent = styled.div<{ $highlight: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background-color: ${(props) => (props.$highlight ? 'rgba(0, 126, 0, 0.06)' : 'var(--color-background)')};
+`
+
+const ModelInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `
 
 export default memo(ManageModelsList)

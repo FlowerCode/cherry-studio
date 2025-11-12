@@ -1,14 +1,12 @@
 import { HStack } from '@renderer/components/Layout'
 import { TopView } from '@renderer/components/TopView'
 import { useAssistant } from '@renderer/hooks/useAssistant'
-import { useSidebarIconShow } from '@renderer/hooks/useSidebarIcon'
 import type { Assistant } from '@renderer/types'
 import { Menu, Modal } from 'antd'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
-import AssistantKnowledgeBaseSettings from './AssistantKnowledgeBaseSettings'
 import AssistantMCPSettings from './AssistantMCPSettings'
 import AssistantModelSettings from './AssistantModelSettings'
 import AssistantPromptSettings from './AssistantPromptSettings'
@@ -19,7 +17,7 @@ interface AssistantSettingPopupShowParams {
   tab?: AssistantSettingPopupTab
 }
 
-type AssistantSettingPopupTab = 'prompt' | 'model' | 'messages' | 'knowledge_base' | 'mcp' | 'regular_phrases'
+type AssistantSettingPopupTab = 'prompt' | 'model' | 'messages' | 'mcp' | 'regular_phrases'
 
 interface Props extends AssistantSettingPopupShowParams {
   resolve: (assistant: Assistant) => void
@@ -31,8 +29,6 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
   const [menu, setMenu] = useState<AssistantSettingPopupTab>(tab || 'prompt')
 
   const { assistant, updateAssistant, updateAssistantSettings } = useAssistant(props.assistant.id)
-
-  const showKnowledgeIcon = useSidebarIconShow('knowledge')
 
   const onOk = () => {
     setOpen(false)
@@ -55,10 +51,6 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
       key: 'model',
       label: t('assistants.settings.model')
     },
-    showKnowledgeIcon && {
-      key: 'knowledge_base',
-      label: t('assistants.settings.knowledge_base.label')
-    },
     {
       key: 'mcp',
       label: t('assistants.settings.mcp.label')
@@ -66,7 +58,7 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
     {
       key: 'regular_phrases',
       label: t('assistants.settings.regular_phrases.title', 'Regular Prompts')
-    },
+    }
   ].filter(Boolean) as { key: string; label: string }[]
 
   return (
@@ -111,13 +103,6 @@ const AssistantSettingPopupContainer: React.FC<Props> = ({ resolve, tab, ...prop
           )}
           {menu === 'model' && (
             <AssistantModelSettings
-              assistant={assistant}
-              updateAssistant={updateAssistant}
-              updateAssistantSettings={updateAssistantSettings}
-            />
-          )}
-          {menu === 'knowledge_base' && showKnowledgeIcon && (
-            <AssistantKnowledgeBaseSettings
               assistant={assistant}
               updateAssistant={updateAssistant}
               updateAssistantSettings={updateAssistantSettings}

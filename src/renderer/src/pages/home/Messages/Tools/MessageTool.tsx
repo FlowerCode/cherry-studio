@@ -1,7 +1,6 @@
 import type { NormalToolResponse } from '@renderer/types'
 import type { ToolMessageBlock } from '@renderer/types/newMessage'
 
-import { MessageKnowledgeSearchToolTitle } from './MessageKnowledgeSearch'
 import { MessageWebSearchToolTitle } from './MessageWebSearch'
 
 interface Props {
@@ -17,8 +16,6 @@ const ChooseTool = (toolResponse: NormalToolResponse): React.ReactNode | null =>
       case 'web_search':
       case 'web_search_preview':
         return toolType === 'provider' ? null : <MessageWebSearchToolTitle toolResponse={toolResponse} />
-      case 'knowledge_search':
-        return <MessageKnowledgeSearchToolTitle toolResponse={toolResponse} />
       default:
         return null
     }

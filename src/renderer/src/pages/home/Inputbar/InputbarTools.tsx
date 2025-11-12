@@ -15,12 +15,11 @@ import {
 import { isSupportUrlContextProvider } from '@renderer/config/providers'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { useShortcutDisplay } from '@renderer/hooks/useShortcuts'
-import { useSidebarIconShow } from '@renderer/hooks/useSidebarIcon'
 import { getProviderByModel } from '@renderer/services/AssistantService'
 import { getModelUniqId } from '@renderer/services/ModelService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { setIsCollapsed, setToolOrder } from '@renderer/store/inputTools'
-import type { FileType, KnowledgeBase, Model } from '@renderer/types'
+import type { FileType, Model } from '@renderer/types'
 import { FileTypes } from '@renderer/types'
 import type { InputBarToolType } from '@renderer/types/chat'
 import { classNames } from '@renderer/utils'
@@ -31,7 +30,6 @@ import {
   AtSign,
   Check,
   CircleChevronRight,
-  FileSearch,
   Hammer,
   Languages,
   Link,
@@ -51,8 +49,6 @@ import styled from 'styled-components'
 import type { AttachmentButtonRef } from './AttachmentButton'
 import AttachmentButton from './AttachmentButton'
 import GenerateImageButton from './GenerateImageButton'
-import type { KnowledgeBaseButtonRef } from './KnowledgeBaseButton'
-import KnowledgeBaseButton from './KnowledgeBaseButton'
 import type { MCPToolsButtonRef } from './MCPToolsButton'
 import MCPToolsButton from './MCPToolsButton'
 import type { MentionModelsButtonRef } from './MentionModelsButton'
@@ -81,8 +77,6 @@ export interface InputbarToolsProps {
   extensions: string[]
   setText: Dispatch<SetStateAction<string>>
   resizeTextArea: () => void
-  selectedKnowledgeBases: KnowledgeBase[]
-  setSelectedKnowledgeBases: Dispatch<SetStateAction<KnowledgeBase[]>>
   mentionedModels: Model[]
   setMentionedModels: Dispatch<SetStateAction<Model[]>>
   couldAddImageFile: boolean
@@ -115,8 +109,6 @@ const InputbarTools = ({
   setFiles,
   setText,
   resizeTextArea,
-  selectedKnowledgeBases,
-  setSelectedKnowledgeBases,
   mentionedModels,
   setMentionedModels,
   couldAddImageFile,
@@ -133,7 +125,6 @@ const InputbarTools = ({
 
   const quickPhrasesButtonRef = useRef<QuickPhrasesButtonRef>(null)
   const mentionModelsButtonRef = useRef<MentionModelsButtonRef>(null)
-  const knowledgeBaseButtonRef = useRef<KnowledgeBaseButtonRef>(null)
   const mcpToolsButtonRef = useRef<MCPToolsButtonRef>(null)
   const attachmentButtonRef = useRef<AttachmentButtonRef>(null)
   const thinkingButtonRef = useRef<ThinkingButtonRef | null>(null)
@@ -150,17 +141,6 @@ const InputbarTools = ({
   )
 
   const showMcpServerButton = useMemo(() => isSupportedToolUse(assistant) || isPromptToolUse(assistant), [assistant])
-
-  const knowledgeSidebarEnabled = useSidebarIconShow('knowledge')
-  const showKnowledgeBaseButton = knowledgeSidebarEnabled && showMcpServerButton
-
-  const handleKnowledgeBaseSelect = useCallback(
-    (bases?: KnowledgeBase[]) => {
-      updateAssistant({ knowledge_bases: bases })
-      setSelectedKnowledgeBases(bases ?? [])
-    },
-    [setSelectedKnowledgeBases, updateAssistant]
-  )
 
   // 仅允许在不含图片文件时mention非视觉模型
   const couldMentionNotVisionModel = useMemo(() => {
@@ -242,17 +222,6 @@ const InputbarTools = ({
         isMenu: true,
         action: () => {
           mentionModelsButtonRef.current?.openQuickPanel()
-        }
-      },
-      {
-        label: t('chat.input.knowledge_base'),
-        description: '',
-        icon: <FileSearch />,
-        isMenu: true,
-        disabled: files.length > 0,
-        hidden: !showKnowledgeBaseButton,
-        action: () => {
-          knowledgeBaseButtonRef.current?.openQuickPanel()
         }
       },
       {
@@ -392,19 +361,6 @@ const InputbarTools = ({
           (isSupportUrlContextProvider(getProviderByModel(model)) || model.endpoint_type === 'gemini')
       },
       {
-        key: 'knowledge_base',
-        label: t('chat.input.knowledge_base'),
-        component: (
-          <KnowledgeBaseButton
-            ref={knowledgeBaseButtonRef}
-            selectedBases={selectedKnowledgeBases}
-            onSelect={handleKnowledgeBaseSelect}
-            disabled={files.length > 0}
-          />
-        ),
-        condition: showKnowledgeBaseButton
-      },
-      {
         key: 'mcp_tools',
         label: t('settings.mcp.title'),
         component: (
@@ -497,7 +453,6 @@ const InputbarTools = ({
     couldMentionNotVisionModel,
     extensions,
     files,
-    handleKnowledgeBaseSelect,
     isExpended,
     mentionedModels,
     model,
@@ -508,10 +463,8 @@ const InputbarTools = ({
     onNewContext,
     onToggleExpended,
     resizeTextArea,
-    selectedKnowledgeBases,
     setFiles,
     setText,
-    showKnowledgeBaseButton,
     showMcpServerButton,
     showThinkingButton,
     t

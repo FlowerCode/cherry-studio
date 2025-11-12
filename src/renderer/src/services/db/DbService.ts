@@ -37,12 +37,7 @@ class DbService implements MessageDataSource {
     return this.getDataSource().fetchMessages(topicId, forceReload)
   }
 
-  async appendMessage(
-    topicId: string,
-    message: Message,
-    blocks: MessageBlock[],
-    insertIndex?: number
-  ): Promise<void> {
+  async appendMessage(topicId: string, message: Message, blocks: MessageBlock[], insertIndex?: number): Promise<void> {
     return this.getDataSource().appendMessage(topicId, message, blocks, insertIndex)
   }
 

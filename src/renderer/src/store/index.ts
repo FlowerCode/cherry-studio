@@ -9,6 +9,7 @@ import assistants from './assistants'
 import backup from './backup'
 import copilot from './copilot'
 import inputToolsReducer from './inputTools'
+import knowledge from './knowledge'
 import llm from './llm'
 import mcp from './mcp'
 import messageBlocksReducer from './messageBlock'
@@ -19,6 +20,8 @@ import selectionStore from './selectionStore'
 import settings from './settings'
 import shortcuts from './shortcuts'
 import tabs from './tabs'
+import translate from './translate'
+import websearch from './websearch'
 
 const logger = loggerService.withContext('Store')
 
@@ -31,11 +34,14 @@ const rootReducer = combineReducers({
   shortcuts,
   mcp,
   copilot,
+  knowledge,
   selectionStore,
   tabs,
   messages: newMessagesReducer,
   messageBlocks: messageBlocksReducer,
-  inputTools: inputToolsReducer
+  inputTools: inputToolsReducer,
+  translate,
+  websearch
 })
 
 const persistedReducer = persistReducer(

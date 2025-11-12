@@ -117,7 +117,7 @@ const runtimeSlice = createSlice({
     },
     setNewlyRenamedTopics: (state, action: PayloadAction<string[]>) => {
       state.chat.newlyRenamedTopics = action.payload
-    },
+    }
   }
 })
 

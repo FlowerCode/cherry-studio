@@ -1,4 +1,4 @@
-import { type AiRequestContext,definePlugin } from '@cherrystudio/ai-core'
+import { type AiRequestContext, definePlugin } from '@cherrystudio/ai-core'
 import type { Assistant } from '@renderer/types'
 
 /**

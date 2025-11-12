@@ -73,7 +73,7 @@ const MessageHeader: FC<Props> = memo(({ assistant, model, message, topic, isGro
   return (
     <Container className="message-header">
       {isAssistantMessage ? (
-      <Avatar
+        <Avatar
           src={avatarSource}
           size={35}
           style={{

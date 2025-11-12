@@ -2,7 +2,6 @@ import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { DraggableList } from '@renderer/components/DraggableList'
 import { DeleteIcon, EditIcon } from '@renderer/components/Icons'
 import { useTheme } from '@renderer/context/ThemeProvider'
-import FileItem from '@renderer/pages/files/FileItem'
 import QuickPhraseService from '@renderer/services/QuickPhraseService'
 import type { QuickPhrase } from '@renderer/types'
 import { Button, Flex, Input, Modal, Popconfirm, Space } from 'antd'
@@ -89,38 +88,29 @@ const QuickPhraseSettings: FC = () => {
               onDragStart={() => setDragging(true)}
               onDragEnd={() => setDragging(false)}>
               {(phrase) => (
-                <FileItem
-                  key={phrase.id}
-                  fileInfo={{
-                    name: phrase.title,
-                    ext: '.txt',
-                    extra: phrase.content,
-                    actions: (
-                      <Flex gap={4} style={{ opacity: 0.6 }}>
-                        <Button
-                          key="edit"
-                          type="text"
-                          icon={<EditIcon size={14} />}
-                          onClick={() => handleEdit(phrase)}
-                        />
-                        <Popconfirm
-                          title={t('settings.quickPhrase.delete')}
-                          description={t('settings.quickPhrase.deleteConfirm')}
-                          okText={t('common.confirm')}
-                          cancelText={t('common.cancel')}
-                          onConfirm={() => handleDelete(phrase.id)}
-                          icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}>
-                          <Button
-                            key="delete"
-                            type="text"
-                            danger
-                            icon={<DeleteIcon size={14} className="lucide-custom" />}
-                          />
-                        </Popconfirm>
-                      </Flex>
-                    )
-                  }}
-                />
+                <PhraseItem key={phrase.id}>
+                  <PhraseContent>
+                    <PhraseTitle>{phrase.title}</PhraseTitle>
+                    <PhraseText>{phrase.content}</PhraseText>
+                  </PhraseContent>
+                  <Flex gap={4} style={{ opacity: 0.6 }}>
+                    <Button key="edit" type="text" icon={<EditIcon size={14} />} onClick={() => handleEdit(phrase)} />
+                    <Popconfirm
+                      title={t('settings.quickPhrase.delete')}
+                      description={t('settings.quickPhrase.deleteConfirm')}
+                      okText={t('common.confirm')}
+                      cancelText={t('common.cancel')}
+                      onConfirm={() => handleDelete(phrase.id)}
+                      icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}>
+                      <Button
+                        key="delete"
+                        type="text"
+                        danger
+                        icon={<DeleteIcon size={14} className="lucide-custom" />}
+                      />
+                    </Popconfirm>
+                  </Flex>
+                </PhraseItem>
               )}
             </DraggableList>
           </QuickPhraseList>
@@ -174,6 +164,33 @@ const QuickPhraseList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+`
+
+const PhraseItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--list-item-border-radius);
+  border: 0.5px solid var(--color-border);
+  background: var(--color-background-soft);
+`
+
+const PhraseContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const PhraseTitle = styled.div`
+  font-weight: 600;
+  color: var(--color-text-1);
+`
+
+const PhraseText = styled.div`
+  color: var(--color-text-2);
+  font-size: 13px;
+  white-space: pre-wrap;
 `
 
 export default QuickPhraseSettings

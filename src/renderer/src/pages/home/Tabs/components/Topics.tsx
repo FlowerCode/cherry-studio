@@ -2,11 +2,9 @@ import { DraggableVirtualList } from '@renderer/components/DraggableList'
 import { CopyIcon, DeleteIcon, EditIcon } from '@renderer/components/Icons'
 import ObsidianExportPopup from '@renderer/components/Popups/ObsidianExportPopup'
 import PromptPopup from '@renderer/components/Popups/PromptPopup'
-import SaveToKnowledgePopup from '@renderer/components/Popups/SaveToKnowledgePopup'
 import { isMac } from '@renderer/config/constant'
 import { useAssistant, useAssistants } from '@renderer/hooks/useAssistant'
 import { useInPlaceEdit } from '@renderer/hooks/useInPlaceEdit'
-import { useNotesSettings } from '@renderer/hooks/useNotesSettings'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { finishTopicRenaming, startTopicRenaming, TopicManager } from '@renderer/hooks/useTopic'
@@ -24,7 +22,6 @@ import {
   exportMarkdownToSiyuan,
   exportMarkdownToYuque,
   exportTopicAsMarkdown,
-  exportTopicToNotes,
   exportTopicToNotion,
   topicToMarkdown
 } from '@renderer/utils/export'
@@ -38,11 +35,9 @@ import {
   FolderOpen,
   HelpCircle,
   MenuIcon,
-  NotebookPen,
   PackagePlus,
   PinIcon,
   PinOffIcon,
-  Save,
   Sparkles,
   UploadIcon,
   XIcon
@@ -63,7 +58,6 @@ interface Props {
 
 export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic, position }) => {
   const { t } = useTranslation()
-  const { notesPath } = useNotesSettings()
   const { assistants } = useAssistants()
   const { assistant, removeTopic, moveTopic, updateTopic, updateTopics } = useAssistant(_assistant.id)
   const { showTopicTime, pinTopicsToTop, setTopicPosition, topicPosition } = useSettings()
@@ -278,14 +272,6 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
         }
       },
       {
-        label: t('notes.save'),
-        key: 'notes',
-        icon: <NotebookPen size={14} />,
-        onClick: async () => {
-          exportTopicToNotes(topic, notesPath)
-        }
-      },
-      {
         label: t('chat.topics.clear.title'),
         key: 'clear-messages',
         icon: <BrushCleaning size={14} />,
@@ -327,27 +313,6 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
             label: t('chat.topics.copy.plain_text'),
             key: 'plain_text',
             onClick: () => copyTopicAsPlainText(topic)
-          }
-        ]
-      },
-      {
-        label: t('chat.save.label'),
-        key: 'save',
-        icon: <Save size={14} />,
-        children: [
-          {
-            label: t('chat.save.topic.knowledge.title'),
-            key: 'knowledge',
-            onClick: async () => {
-              try {
-                const result = await SaveToKnowledgePopup.showForTopic(topic)
-                if (result?.success) {
-                  window.toast.success(t('chat.save.topic.knowledge.success', { count: result.savedCount }))
-                }
-              } catch {
-                window.toast.error(t('chat.save.topic.knowledge.error.save_failed'))
-              }
-            }
           }
         ]
       },
@@ -462,7 +427,6 @@ export const Topics: React.FC<Props> = ({ assistant: _assistant, activeTopic, se
     exportMenuOptions.joplin,
     exportMenuOptions.siyuan,
     assistants,
-    notesPath,
     assistant,
     updateTopic,
     activeTopic.id,

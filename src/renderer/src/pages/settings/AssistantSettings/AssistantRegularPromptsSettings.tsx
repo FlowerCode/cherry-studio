@@ -1,7 +1,6 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { DraggableList } from '@renderer/components/DraggableList'
 import { DeleteIcon, EditIcon } from '@renderer/components/Icons'
-import FileItem from '@renderer/pages/files/FileItem'
 import type { Assistant, QuickPhrase } from '@renderer/types'
 import { Button, Flex, Input, Modal, Popconfirm, Space } from 'antd'
 import { PlusIcon } from 'lucide-react'
@@ -97,36 +96,27 @@ const AssistantRegularPromptsSettings: FC<AssistantRegularPromptsSettingsProps> 
             onDragStart={() => setDragging(true)}
             onDragEnd={() => setDragging(false)}>
             {(prompt) => (
-              <FileItem
-                key={prompt.id}
-                fileInfo={{
-                  name: prompt.title,
-                  ext: '.txt',
-                  extra: prompt.content,
-                  actions: (
-                    <Flex gap={4} style={{ opacity: 0.6 }}>
-                      <Button key="edit" type="text" icon={<EditIcon size={14} />} onClick={() => handleEdit(prompt)} />
-                      <Popconfirm
-                        title={t('assistants.settings.regular_phrases.delete', 'Delete Prompt')}
-                        description={t(
-                          'assistants.settings.regular_phrases.deleteConfirm',
-                          'Are you sure to delete this prompt?'
-                        )}
-                        okText={t('common.confirm')}
-                        cancelText={t('common.cancel')}
-                        onConfirm={() => handleDelete(prompt.id)}
-                        icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}>
-                        <Button
-                          key="delete"
-                          type="text"
-                          danger
-                          icon={<DeleteIcon size={14} className="lucide-custom" />}
-                        />
-                      </Popconfirm>
-                    </Flex>
-                  )
-                }}
-              />
+              <PromptItem key={prompt.id}>
+                <PromptContent>
+                  <PromptTitle>{prompt.title}</PromptTitle>
+                  <PromptText>{prompt.content}</PromptText>
+                </PromptContent>
+                <Flex gap={4} style={{ opacity: 0.6 }}>
+                  <Button key="edit" type="text" icon={<EditIcon size={14} />} onClick={() => handleEdit(prompt)} />
+                  <Popconfirm
+                    title={t('assistants.settings.regular_phrases.delete', 'Delete Prompt')}
+                    description={t(
+                      'assistants.settings.regular_phrases.deleteConfirm',
+                      'Are you sure to delete this prompt?'
+                    )}
+                    okText={t('common.confirm')}
+                    cancelText={t('common.cancel')}
+                    onConfirm={() => handleDelete(prompt.id)}
+                    icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}>
+                    <Button key="delete" type="text" danger icon={<DeleteIcon size={14} className="lucide-custom" />} />
+                  </Popconfirm>
+                </Flex>
+              </PromptItem>
             )}
           </DraggableList>
         </StyledPromptList>
@@ -186,6 +176,33 @@ const StyledPromptList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+`
+
+const PromptItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--list-item-border-radius);
+  border: 0.5px solid var(--color-border);
+  background: var(--color-background-soft);
+`
+
+const PromptContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const PromptTitle = styled.div`
+  font-weight: 600;
+  color: var(--color-text-1);
+`
+
+const PromptText = styled.div`
+  color: var(--color-text-2);
+  font-size: 13px;
+  white-space: pre-wrap;
 `
 
 export default AssistantRegularPromptsSettings

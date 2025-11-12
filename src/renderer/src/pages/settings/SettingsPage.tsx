@@ -6,7 +6,6 @@ import {
   Cloud,
   Command,
   Hammer,
-  HardDrive,
   Info,
   MonitorCog,
   Package,
@@ -21,7 +20,6 @@ import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
 import AboutSettings from './AboutSettings'
-import DataSettings from './DataSettings/DataSettings'
 import DisplaySettings from './DisplaySettings/DisplaySettings'
 import GeneralSettings from './GeneralSettings'
 import MCPSettings from './MCPSettings'
@@ -67,12 +65,6 @@ const SettingsPage: FC = () => {
             <MenuItem className={isRoute('/settings/display')}>
               <MonitorCog size={18} />
               {t('settings.display.title')}
-            </MenuItem>
-          </MenuItemLink>
-          <MenuItemLink to="/settings/data">
-            <MenuItem className={isRoute('/settings/data')}>
-              <HardDrive size={18} />
-              {t('settings.data.title')}
             </MenuItem>
           </MenuItemLink>
           <Divider />
@@ -126,7 +118,6 @@ const SettingsPage: FC = () => {
             <Route path="shortcut" element={<ShortcutSettings />} />
             <Route path="quickAssistant" element={<QuickAssistantSettings />} />
             <Route path="selectionAssistant" element={<SelectionAssistantSettings />} />
-            <Route path="data" element={<DataSettings />} />
             <Route path="about" element={<AboutSettings />} />
           </Routes>
         </SettingContent>

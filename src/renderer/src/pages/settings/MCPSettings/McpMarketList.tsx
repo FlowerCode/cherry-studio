@@ -10,7 +10,9 @@ const McpMarketList: FC = () => {
   return (
     <>
       <SettingTitle style={{ marginBottom: 10 }}>{t('settings.mcp.findMore')}</SettingTitle>
-      <Placeholder>{t('settings.mcp.more.none', 'No curated marketplaces are bundled. Add MCP servers manually.')}</Placeholder>
+      <Placeholder>
+        {t('settings.mcp.more.none', 'No curated marketplaces are bundled. Add MCP servers manually.')}
+      </Placeholder>
     </>
   )
 }

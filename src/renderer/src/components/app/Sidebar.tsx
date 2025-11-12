@@ -20,7 +20,6 @@ import styled from 'styled-components'
 import UserPopup from '../Popups/UserPopup'
 
 const Sidebar: FC = () => {
-
   const { pathname } = useLocation()
   const navigate = useNavigate()
 
@@ -40,10 +39,7 @@ const Sidebar: FC = () => {
   const isFullscreen = useFullscreen()
 
   return (
-    <Container
-      $isFullscreen={isFullscreen}
-      id="app-sidebar"
-      style={{ backgroundColor }}>
+    <Container $isFullscreen={isFullscreen} id="app-sidebar" style={{ backgroundColor }}>
       {isEmoji(avatar) ? (
         <EmojiAvatar onClick={onEditUser} className="sidebar-avatar" size={31} fontSize={18}>
           {avatar}

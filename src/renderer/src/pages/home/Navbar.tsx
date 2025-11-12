@@ -77,8 +77,8 @@ const HeaderNavbar: FC = () => {
               <PanelRightClose size={18} />
             </NavbarIcon>
           </Tooltip>
-      </NavbarLeft>
-    )}
+        </NavbarLeft>
+      )}
       <NavbarCenter></NavbarCenter>
       <NavbarRight
         style={{

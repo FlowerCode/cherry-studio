@@ -159,7 +159,6 @@ if (!app.requestSingleInstanceLock()) {
 
     //start selection assistant service
     initSelectionService()
-
   })
 
   registerProtocolClient(app)

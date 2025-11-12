@@ -6,7 +6,6 @@ export type InputBarToolType =
   | 'thinking'
   | 'web_search'
   | 'url_context'
-  | 'knowledge_base'
   | 'mcp_tools'
   | 'generate_image'
   | 'mention_models'

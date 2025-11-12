@@ -16,7 +16,6 @@ import { useMessageOperations, useTopicLoading } from '@renderer/hooks/useMessag
 import { modelGenerating, useRuntime } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { useShortcut } from '@renderer/hooks/useShortcuts'
-import { useSidebarIconShow } from '@renderer/hooks/useSidebarIcon'
 import { useTimer } from '@renderer/hooks/useTimer'
 import useTranslate from '@renderer/hooks/useTranslate'
 import { getDefaultTopic } from '@renderer/services/AssistantService'
@@ -30,7 +29,7 @@ import { translateText } from '@renderer/services/TranslateService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { setSearching } from '@renderer/store/runtime'
 import { sendMessage as _sendMessage } from '@renderer/store/thunk/messageThunk'
-import type { Assistant, FileType, KnowledgeBase, Model, Topic } from '@renderer/types'
+import type { Assistant, FileType, Model, Topic } from '@renderer/types'
 import type { MessageInputBaseParams } from '@renderer/types/newMessage'
 import { classNames, delay, filterSupportedFiles } from '@renderer/utils'
 import { formatQuotedText } from '@renderer/utils/formats'
@@ -56,7 +55,6 @@ import NarrowLayout from '../Messages/NarrowLayout'
 import AttachmentPreview from './AttachmentPreview'
 import type { InputbarToolsRef } from './InputbarTools'
 import InputbarTools from './InputbarTools'
-import KnowledgeBaseInput from './KnowledgeBaseInput'
 import MentionModelsInput from './MentionModelsInput'
 import SendMessageButton from './SendMessageButton'
 import TokenCount from './TokenCount'
@@ -103,7 +101,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   const [spaceClickCount, setSpaceClickCount] = useState(0)
   const spaceClickTimer = useRef<NodeJS.Timeout>(null)
   const [isTranslating, setIsTranslating] = useState(false)
-  const [selectedKnowledgeBases, setSelectedKnowledgeBases] = useState<KnowledgeBase[]>([])
   const [mentionedModels, setMentionedModels] = useState<Model[]>(_mentionedModelsCache)
   const mentionedModelsRef = useRef(mentionedModels)
   const [isDragging, setIsDragging] = useState(false)
@@ -156,8 +153,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   }, [couldAddImageFile, couldAddTextFile])
 
   const quickPanel = useQuickPanel()
-
-  const showKnowledgeIcon = useSidebarIconShow('knowledge')
 
   const [tokenCount, setTokenCount] = useState(0)
 
@@ -762,7 +757,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
   }, [
     topic.id,
     assistant.mcpServers,
-    assistant.knowledge_bases,
     assistant.enableWebSearch,
     assistant.webSearchProviderId,
     mentionedModels,
@@ -799,22 +793,8 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
     return () => window.removeEventListener('focus', onFocus)
   }, [focusTextarea])
 
-  useEffect(() => {
-    // if assistant knowledge bases are undefined return []
-    setSelectedKnowledgeBases(showKnowledgeIcon ? (assistant.knowledge_bases ?? []) : [])
-  }, [assistant.id, assistant.knowledge_bases, showKnowledgeIcon])
-
   const handleRemoveModel = (model: Model) => {
     setMentionedModels(mentionedModels.filter((m) => m.id !== model.id))
-  }
-
-  const handleRemoveKnowledgeBase = (knowledgeBase: KnowledgeBase) => {
-    const newKnowledgeBases = assistant.knowledge_bases?.filter((kb) => kb.id !== knowledgeBase.id)
-    updateAssistant({
-      ...assistant,
-      knowledge_bases: newKnowledgeBases
-    })
-    setSelectedKnowledgeBases(newKnowledgeBases ?? [])
   }
 
   useEffect(() => {
@@ -872,12 +852,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
           {files.length > 0 && (
             <AttachmentPreview files={files} setFiles={setFiles} onAttachmentContextMenu={appendTxtContentToInput} />
           )}
-          {selectedKnowledgeBases.length > 0 && (
-            <KnowledgeBaseInput
-              selectedKnowledgeBases={selectedKnowledgeBases}
-              onRemoveKnowledgeBase={handleRemoveKnowledgeBase}
-            />
-          )}
           {mentionedModels.length > 0 && (
             <MentionModelsInput selectedModels={mentionedModels} onRemoveModel={handleRemoveModel} />
           )}
@@ -927,8 +901,6 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic, topic }) =
               setFiles={setFiles}
               setText={setText}
               resizeTextArea={resizeTextArea}
-              selectedKnowledgeBases={selectedKnowledgeBases}
-              setSelectedKnowledgeBases={setSelectedKnowledgeBases}
               mentionedModels={mentionedModels}
               setMentionedModels={setMentionedModels}
               couldAddImageFile={couldAddImageFile}

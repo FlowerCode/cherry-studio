@@ -3,7 +3,6 @@ import { isLocalAi } from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import db from '@renderer/databases'
 import i18n from '@renderer/i18n'
-import KnowledgeQueue from '@renderer/queue/KnowledgeQueue'
 import { useAppDispatch } from '@renderer/store'
 import { handleSaveData } from '@renderer/store'
 import { setAvatar, setFilesPath, setResourcesPath, setUpdateState } from '@renderer/store/runtime'
@@ -40,7 +39,6 @@ export function useAppInit() {
     document.getElementById('spinner')?.remove()
     // eslint-disable-next-line no-restricted-syntax
     console.timeEnd('init')
-
   }, [])
 
   useEffect(() => {
@@ -129,10 +127,6 @@ export function useAppInit() {
       dispatch(setResourcesPath(info.resourcesPath))
     })
   }, [dispatch])
-
-  useEffect(() => {
-    KnowledgeQueue.checkAllBases()
-  }, [])
 
   useEffect(() => {
     let customCssElement = document.getElementById('user-defined-custom-css') as HTMLStyleElement

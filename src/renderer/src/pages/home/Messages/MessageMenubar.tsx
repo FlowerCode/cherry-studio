@@ -2,7 +2,6 @@
 import { loggerService } from '@logger'
 import { CopyIcon, DeleteIcon, EditIcon, RefreshIcon } from '@renderer/components/Icons'
 import ObsidianExportPopup from '@renderer/components/Popups/ObsidianExportPopup'
-import SaveToKnowledgePopup from '@renderer/components/Popups/SaveToKnowledgePopup'
 import { SelectModelPopup } from '@renderer/components/Popups/SelectModelPopup'
 import { isEmbeddingModel, isRerankModel, isVisionModel } from '@renderer/config/models'
 import type { MessageMenubarButtonId, MessageMenubarScope } from '@renderer/config/registry/messageMenubar'
@@ -10,7 +9,6 @@ import { DEFAULT_MESSAGE_MENUBAR_SCOPE, getMessageMenubarConfig } from '@rendere
 import { useMessageEditing } from '@renderer/context/MessageEditingContext'
 import { useChatContext } from '@renderer/hooks/useChatContext'
 import { useMessageOperations } from '@renderer/hooks/useMessageOperations'
-import { useNotesSettings } from '@renderer/hooks/useNotesSettings'
 import { useEnableDeveloperMode, useMessageStyle, useSettings } from '@renderer/hooks/useSettings'
 import { useTemporaryValue } from '@renderer/hooks/useTemporaryValue'
 import useTranslate from '@renderer/hooks/useTranslate'
@@ -31,7 +29,6 @@ import {
   exportMarkdownToSiyuan,
   exportMarkdownToYuque,
   exportMessageAsMarkdown,
-  exportMessageToNotes,
   exportMessageToNotion,
   messageToMarkdown
 } from '@renderer/utils/export'
@@ -47,19 +44,7 @@ import type { MenuProps } from 'antd'
 import { Dropdown, Popconfirm, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import type { TFunction } from 'i18next'
-import {
-  AtSign,
-  Check,
-  FilePenLine,
-  Languages,
-  ListChecks,
-  Menu,
-  NotebookPen,
-  Save,
-  Split,
-  ThumbsUp,
-  Upload
-} from 'lucide-react'
+import { AtSign, Check, FilePenLine, Languages, ListChecks, Menu, Save, Split, ThumbsUp, Upload } from 'lucide-react'
 import type { Dispatch, FC, ReactNode, SetStateAction } from 'react'
 import { Fragment, memo, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -105,7 +90,6 @@ type MessageMenubarButtonContext = {
   isLastMessage: boolean
   isUserMessage: boolean
   message: Message
-  notesPath: string
   onCopy: (e: React.MouseEvent) => void
   onEdit: () => void | Promise<void>
   onMentionModel: (e: React.MouseEvent) => void | Promise<void>
@@ -135,7 +119,6 @@ const MessageMenubar: FC<Props> = (props) => {
     onUpdateUseful
   } = props
   const { t } = useTranslation()
-  const { notesPath } = useNotesSettings()
   const { toggleMultiSelectMode } = useChatContext(props.topic)
   const [copied, setCopied] = useTemporaryValue(false, 2000)
   const [isTranslating, setIsTranslating] = useState(false)
@@ -304,13 +287,6 @@ const MessageMenubar: FC<Props> = (props) => {
             onClick: () => {
               const fileName = dayjs(message.createdAt).format('YYYYMMDDHHmm') + '.md'
               window.api.file.save(fileName, mainTextContent)
-            }
-          },
-          {
-            label: t('chat.save.knowledge.title'),
-            key: 'knowledge',
-            onClick: () => {
-              SaveToKnowledgePopup.showForMessage(message)
             }
           }
         ]
@@ -544,7 +520,6 @@ const MessageMenubar: FC<Props> = (props) => {
     isLastMessage,
     isUserMessage,
     message,
-    notesPath,
     onCopy,
     onEdit,
     onMentionModel,
@@ -846,27 +821,6 @@ const buttonRenderers: Record<MessageMenubarButtonId, MessageMenubarButtonRender
           ) : (
             <ThumbsUp size={15} />
           )}
-        </ActionButton>
-      </Tooltip>
-    )
-  },
-  notes: ({ isAssistantMessage, softHoverBg, message, notesPath, t }) => {
-    if (!isAssistantMessage) {
-      return null
-    }
-
-    return (
-      <Tooltip title={t('notes.save')} mouseEnterDelay={0.8}>
-        <ActionButton
-          className="message-action-button"
-          onClick={async (e) => {
-            e.stopPropagation()
-            const title = await getMessageTitle(message)
-            const markdown = messageToMarkdown(message)
-            exportMessageToNotes(title, markdown, notesPath)
-          }}
-          $softHoverBg={softHoverBg}>
-          <NotebookPen size={15} />
         </ActionButton>
       </Tooltip>
     )
